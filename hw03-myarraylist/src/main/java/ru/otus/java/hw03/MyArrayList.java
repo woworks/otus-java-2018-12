@@ -2,10 +2,7 @@ package ru.otus.java.hw03;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
 
@@ -26,7 +23,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean contains(Object o) {
         for (int i = 0; i < this.container.get().length; i++) {
-            if (((T)o).equals(((T) this.container.get()[i]))){
+            if (((T) o).equals(((T) this.container.get()[i]))) {
                 return true;
             }
         }
@@ -41,21 +38,21 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public Object[] toArray() {
         Object[] newArray = new Object[container.get().length];
-        System.arraycopy(container.get(),0, newArray, 0, container.get().length);
+        System.arraycopy(container.get(), 0, newArray, 0, container.get().length);
         return newArray;
     }
 
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        System.arraycopy(container.get(),0, a, 0, container.get().length);
+        System.arraycopy(container.get(), 0, a, 0, container.get().length);
         return a;
     }
 
     @Override
     public boolean add(T newObject) {
         int currentArraySize = this.container.get().length;
-        T[] newArray = (T[])new Object[currentArraySize + 1];
-        System.arraycopy(this.container.get(),0, newArray, 0, currentArraySize);
+        T[] newArray = (T[]) new Object[currentArraySize + 1];
+        System.arraycopy(this.container.get(), 0, newArray, 0, currentArraySize);
         newArray[currentArraySize] = newObject;
         this.container = new ArrayContainer<T>(newArray);
 
@@ -68,7 +65,7 @@ public class MyArrayList<T> implements List<T> {
         boolean found = false;
         int j = 0;
         for (int i = 0; i < container.get().length; i++) {
-            if (!((T)o).equals(((T) container.get()[i]))){
+            if (!((T) o).equals(((T) container.get()[i]))) {
                 newArray[j++] = container.get()[i];
             } else {
                 found = true;
@@ -76,7 +73,7 @@ public class MyArrayList<T> implements List<T> {
         }
 
         if (found) {
-            container.set((T[])newArray);
+            container.set((T[]) newArray);
         }
 
         return found;
@@ -84,11 +81,11 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-         for (Object item: c) {
+        for (Object item : c) {
             if (!this.contains(item)) {
                 return false;
             }
-         }
+        }
         return true;
     }
 
@@ -106,14 +103,14 @@ public class MyArrayList<T> implements List<T> {
     public boolean addAll(int index, Collection<? extends T> c) {
         Object[] newArray = new Object[container.get().length + c.size()];
 
-        T[] originalArray = (T[])new Object[container.get().length];
+        T[] originalArray = (T[]) new Object[container.get().length];
 
         System.arraycopy(container.get(), 0, originalArray, 0, container.get().length);
         System.arraycopy(container.get(), 0, newArray, 0, container.get().length);
 
         System.arraycopy(c.toArray(), 0, newArray, index, c.size());
 
-        System.arraycopy(originalArray, index, newArray, index + c.size() - 1, originalArray.length - index);
+        System.arraycopy(originalArray, index, newArray, index + c.size(), originalArray.length - index);
 
         container.set((T[]) newArray);
 
@@ -122,12 +119,29 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new NotImplementedException();
+        int initialSize = this.container.get().length;
+        for (Object item : c) {
+            this.remove(item);
+        }
+
+        int sizeAfterDelete = this.container.get().length;
+
+        return initialSize != sizeAfterDelete;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new NotImplementedException();
+        int initialSize = this.container.get().length;
+
+        for (T item : this.container.get()) {
+            if (!c.contains(item)) {
+                this.remove(item);
+            }
+        }
+
+        int sizeAfterDelete = this.container.get().length;
+
+        return initialSize != sizeAfterDelete;
     }
 
     @Override
@@ -149,44 +163,71 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public void add(int index, T element) {
-        throw new NotImplementedException();
+        this.addAll(index, Arrays.asList(element));
     }
 
     @Override
     public T remove(int index) {
-        throw new NotImplementedException();
+        Iterator iterator = this.listIterator();
+        int i = 0;
+        T itemToRemove = null;
+        while (iterator.hasNext()) {
+            if (i == index) {
+                itemToRemove = this.container.get()[i];
+                iterator.remove();
+            }
+        }
+
+        return itemToRemove;
     }
 
     @Override
     public int indexOf(Object o) {
-        throw new NotImplementedException();
+        int index = 0;
+        for (int i = 0; i < this.container.get().length; i++) {
+            if (((T) o).equals(this.container.get()[i])) {
+                index = i;
+            }
+        }
+
+        return index;
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        throw new NotImplementedException();
+        int lastIndex = 0;
+        for (int i = this.container.get().length - 1; i > 0; i--) {
+            if (((T) o).equals(this.container.get()[i])) {
+                lastIndex = i;
+            }
+        }
+
+        return lastIndex;
     }
 
     @Override
     public ListIterator<T> listIterator() {
-        throw new NotImplementedException();
+        return new MyArrayListIterator();
     }
 
     @Override
     public ListIterator<T> listIterator(int index) {
-        throw new NotImplementedException();
+        return new MyArrayListIterator(index);
     }
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        throw new NotImplementedException();
+        T[] newArray = (T[])new Object[toIndex - fromIndex];
+
+        System.arraycopy(container.get(), fromIndex, newArray, 0, toIndex - fromIndex);
+        return Arrays.asList(newArray);
     }
 
     public class MyArrayIterator implements Iterator {
         private int position = 0;
 
         public boolean hasNext() {
-            if (position <  container.get().length)
+            if (position < container.get().length - 1)
                 return true;
             else
                 return false;
@@ -203,6 +244,79 @@ public class MyArrayList<T> implements List<T> {
         public void remove() {
             MyArrayList.this.remove(position);
 
+        }
+    }
+
+    public class MyArrayListIterator implements ListIterator {
+
+        private int position = 0;
+
+        public MyArrayListIterator() {
+            this.position = 0;
+        }
+
+        public MyArrayListIterator(int position) {
+            this.position = position;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (position < container.get().length - 1)
+                return true;
+            else
+                return false;
+        }
+
+        @Override
+        public Object next() {
+            if (this.hasNext())
+                return container.get()[position++];
+            else
+                return null;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return position > 0;
+        }
+
+        @Override
+        public Object previous() {
+            if (this.hasPrevious())
+                return container.get()[position--];
+            else
+                return null;
+        }
+
+        @Override
+        public int nextIndex() {
+            if (this.hasNext())
+                return ++position;
+            else
+                return -1;
+        }
+
+        @Override
+        public int previousIndex() {
+            if (this.hasPrevious())
+                return --position;
+            else
+                return -1;
+        }
+
+        @Override
+        public void remove() {
+            MyArrayList.this.remove(position);
+        }
+
+        @Override
+        public void set(Object o) {
+            MyArrayList.this.set(position, (T) o);
+        }
+
+        @Override
+        public void add(Object o) {
+            MyArrayList.this.add((T) o);
         }
     }
 }
