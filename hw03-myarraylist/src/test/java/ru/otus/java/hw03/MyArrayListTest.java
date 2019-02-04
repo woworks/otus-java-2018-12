@@ -2,10 +2,7 @@ package ru.otus.java.hw03;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -195,41 +192,176 @@ public class MyArrayListTest {
 
     @Test
     public void removeAll() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+
+        List<Sample> listToRemove = new MyArrayList<>();
+        listToRemove.add(sample2);
+        listToRemove.add(sample3);
+
+        list.removeAll(listToRemove);
+
+        assertEquals(1, list.size());
+        assertEquals(sample1, list.get(0));
     }
 
     @Test
     public void retainAll() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+
+        List<Sample> listToRetain = new MyArrayList<>();
+        listToRetain.add(sample2);
+        listToRetain.add(sample3);
+
+        list.retainAll(listToRetain);
+
+        assertEquals(2, list.size());
+        assertEquals(sample2, list.get(0));
+        assertEquals(sample3, list.get(1));
     }
 
     @Test
     public void clear() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+        list.clear();
+
+        assertEquals(0, list.size());
     }
 
     @Test
-    public void addWithParam() {
+    public void CollectionsAddAll() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+
+        Sample sample4 = new Sample("Four", 4L, new Date());
+        Sample sample5 = new Sample("Five", 5L, new Date());
+        Sample sample6 = new Sample("Six", 6L, new Date());
+
+        Sample[] listToAdd = new Sample[3];
+        listToAdd[0] = sample4;
+        listToAdd[1] = sample5;
+        listToAdd[2] = sample6;
+
+
+        Collections.addAll(list, listToAdd);
+
+        assertEquals(6, list.size());
+        assertEquals(sample4, list.get(3));
+        assertEquals(sample5, list.get(4));
+        assertEquals(sample6, list.get(5));
+
     }
 
     @Test
-    public void remove1() {
+    public void ColllectionsCopy() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+
+        Sample sample4 = new Sample("Four", 4L, new Date());
+        Sample sample5 = new Sample("Five", 5L, new Date());
+        Sample sample6 = new Sample("Six", 6L, new Date());
+
+        List<Sample> listToCopy = new MyArrayList<>();
+        listToCopy.add(sample4);
+        listToCopy.add(sample5);
+        listToCopy.add(sample6);
+
+
+        Collections.copy(listToCopy, list);
+
+        assertEquals(3, list.size());
+        assertEquals(sample1, listToCopy.get(0));
+        assertEquals(sample2, listToCopy.get(1));
+        assertEquals(sample3, listToCopy.get(2));
     }
 
     @Test
-    public void indexOf() {
+    public void CollectionsSort() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+        Sample sample4 = new Sample("Four", 4L, new Date());
+        Sample sample5 = new Sample("Five", 5L, new Date());
+        Sample sample6 = new Sample("Six", 6L, new Date());
+
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample3);
+        list.add(sample4);
+        list.add(sample5);
+        list.add(sample6);
+        list.add(sample1);
+        list.add(sample2);
+
+        Collections.sort(list);
+
+        assertEquals(6, list.size());
+        assertEquals(sample1, list.get(0));
+        assertEquals(sample2, list.get(1));
+        assertEquals(sample3, list.get(2));
+        assertEquals(sample4, list.get(3));
+        assertEquals(sample5, list.get(4));
+        assertEquals(sample6, list.get(5));
     }
 
     @Test
-    public void lastIndexOf() {
+    public void CollectionsSortInteger() {
+
+
+        List<Integer> list = new MyArrayList<>();
+        list.add(new Integer(3));
+        list.add(new Integer(4));
+        list.add(new Integer(5));
+        list.add(new Integer(6));
+        list.add(new Integer(1));
+        list.add(new Integer(2));
+
+        Collections.sort(list);
+
+        assertEquals(6, list.size());
+        assertEquals(new Integer(1), list.get(0));
+        assertEquals(new Integer(2), list.get(1));
+        assertEquals(new Integer(3), list.get(2));
+        assertEquals(new Integer(4), list.get(3));
+        assertEquals(new Integer(5), list.get(4));
+        assertEquals(new Integer(6), list.get(5));
     }
 
-    @Test
-    public void listIterator() {
-    }
-
-    @Test
-    public void listIterator1() {
-    }
-
-    @Test
-    public void subList() {
-    }
 }

@@ -2,7 +2,7 @@ package ru.otus.java.hw03;
 
 import java.util.Date;
 
-public class Sample {
+public class Sample implements Comparable{
     private String stringField;
     private Long longField;
     private Date dateField;
@@ -67,5 +67,11 @@ public class Sample {
                 ", longField=" + longField +
                 ", dateField=" + dateField +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        return (int) (longField - ((Sample)o).longField);
     }
 }
