@@ -130,7 +130,7 @@ public class MyArrayListTest {
         list.add(sample2);
         list.add(sample3);
 
-        List collection = new ArrayList();
+        List<Sample> collection = new ArrayList<>();
         collection.add(sample1);
         collection.add(sample2);
 
@@ -148,14 +148,14 @@ public class MyArrayListTest {
         list.add(sample2);
         list.add(sample3);
 
-        List collection = new ArrayList();
+        List<Sample> collection = new ArrayList<>();
         collection.add(sample1);
         collection.add(sample2);
 
         list.addAll(collection);
 
         assertEquals(5, list.size());
-        assertTrue(list.containsAll(list));
+        assertTrue(list.containsAll(collection));
         assertEquals(sample1, list.get(0));
         assertEquals(sample2, list.get(1));
         assertEquals(sample3, list.get(2));
@@ -176,7 +176,7 @@ public class MyArrayListTest {
         list.add(sample2);
         list.add(sample3);
 
-        List collection = new ArrayList();
+        List<Sample> collection = new ArrayList();
         collection.add(sample4);
         collection.add(sample5);
 
@@ -342,26 +342,24 @@ public class MyArrayListTest {
     }
 
     @Test
-    public void CollectionsSortInteger() {
-
-
+    public void collectionsSortInteger() {
         List<Integer> list = new MyArrayList<>();
-        list.add(new Integer(3));
-        list.add(new Integer(4));
-        list.add(new Integer(5));
-        list.add(new Integer(6));
-        list.add(new Integer(1));
-        list.add(new Integer(2));
+        list.add(3);
+        list.add(4);
+        list.add(5);
+        list.add(6);
+        list.add(1);
+        list.add(2);
 
         Collections.sort(list);
 
         assertEquals(6, list.size());
-        assertEquals(new Integer(1), list.get(0));
-        assertEquals(new Integer(2), list.get(1));
-        assertEquals(new Integer(3), list.get(2));
-        assertEquals(new Integer(4), list.get(3));
-        assertEquals(new Integer(5), list.get(4));
-        assertEquals(new Integer(6), list.get(5));
+        assertEquals(1, list.get(0).intValue());
+        assertEquals(2, list.get(1).intValue());
+        assertEquals(3, list.get(2).intValue());
+        assertEquals(4, list.get(3).intValue());
+        assertEquals(5, list.get(4).intValue());
+        assertEquals(6, list.get(5).intValue());
     }
 
 }
