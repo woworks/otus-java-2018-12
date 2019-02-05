@@ -1,7 +1,5 @@
 package ru.otus.java.hw03;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
@@ -23,7 +21,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean contains(Object o) {
         for (int i = 0; i < this.container.get().length; i++) {
-            if (((T) o).equals(((T) this.container.get()[i]))) {
+            if (o.equals(((T) this.container.get()[i]))) {
                 return true;
             }
         }
@@ -54,7 +52,7 @@ public class MyArrayList<T> implements List<T> {
         T[] newArray = (T[]) new Object[currentArraySize + 1];
         System.arraycopy(this.container.get(), 0, newArray, 0, currentArraySize);
         newArray[currentArraySize] = newObject;
-        this.container = new ArrayContainer<T>(newArray);
+        this.container = new ArrayContainer<>(newArray);
 
         return true;
     }
@@ -65,7 +63,7 @@ public class MyArrayList<T> implements List<T> {
         boolean found = false;
         int j = 0;
         for (int i = 0; i < container.get().length; i++) {
-            if (!((T) o).equals(((T) container.get()[i]))) {
+            if (!o.equals((container.get()[i]))) {
                 newArray[j++] = container.get()[i];
             } else {
                 found = true;
@@ -120,8 +118,8 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean removeAll(Collection<?> c) {
         int initialSize = this.container.get().length;
-        for (Object item : c) {
-            this.remove(item);
+        for (int i = 0; i < c.size(); i++) {
+             this.remove(c.toArray()[i]);
         }
 
         int sizeAfterDelete = this.container.get().length;
@@ -168,13 +166,13 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T remove(int index) {
-        Iterator iterator = this.listIterator();
+        Iterator removeIterator = this.listIterator();
         int i = 0;
         T itemToRemove = null;
-        while (iterator.hasNext()) {
+        while (removeIterator.hasNext()) {
             if (i == index) {
                 itemToRemove = this.container.get()[i];
-                iterator.remove();
+                removeIterator.remove();
             }
         }
 
@@ -217,7 +215,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        T[] newArray = (T[])new Object[toIndex - fromIndex];
+        T[] newArray = (T[]) new Object[toIndex - fromIndex];
 
         System.arraycopy(container.get(), fromIndex, newArray, 0, toIndex - fromIndex);
         return Arrays.asList(newArray);
@@ -227,17 +225,14 @@ public class MyArrayList<T> implements List<T> {
         private int position = 0;
 
         public boolean hasNext() {
-            if (position < container.get().length - 1)
-                return true;
-            else
-                return false;
+            return (position < container.get().length - 1);
         }
 
         public T next() {
             if (this.hasNext())
                 return container.get()[position++];
             else
-                return null;
+                throw new NoSuchElementException();
         }
 
         @Override
@@ -249,10 +244,9 @@ public class MyArrayList<T> implements List<T> {
 
     public class MyArrayListIterator implements ListIterator {
 
-        private int position = 0;
+        private int position = -1;
 
         public MyArrayListIterator() {
-            this.position = 0;
         }
 
         public MyArrayListIterator(int position) {
@@ -261,18 +255,17 @@ public class MyArrayList<T> implements List<T> {
 
         @Override
         public boolean hasNext() {
-            if (position < container.get().length - 1)
-                return true;
-            else
-                return false;
+            return position < container.get().length - 1;
         }
 
         @Override
         public Object next() {
-            if (this.hasNext())
-                return container.get()[position++];
-            else
-                return null;
+            if (this.hasNext()) {
+                return container.get()[++position];
+            } else {
+                throw new NoSuchElementException();
+            }
+
         }
 
         @Override
