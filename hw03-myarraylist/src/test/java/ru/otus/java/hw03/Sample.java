@@ -7,10 +7,10 @@ public class Sample implements Comparable{
     private Long longField;
     private Date dateField;
 
-    public Sample() {
+    Sample() {
     }
 
-    public Sample(String stringField, Long longField, Date dateField) {
+    Sample(String stringField, Long longField, Date dateField) {
         this.stringField = stringField;
         this.longField = longField;
         this.dateField = dateField;
