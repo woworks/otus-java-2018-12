@@ -4,13 +4,15 @@ import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
 
-    private ArrayContainer<T> container = new ArrayContainer<>();
+     private static final int MARGIN = 5;
+    private T[] underlyingArray = (T[]) new Object[MARGIN];
+    private int arraySize = 0;
 
     private MyArrayIterator iterator = new MyArrayIterator();
 
     @Override
     public int size() {
-        return container.get().length;
+        return this.arraySize;
     }
 
     @Override
@@ -20,8 +22,9 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean contains(Object o) {
-        for (int i = 0; i < this.container.get().length; i++) {
-            if (o.equals(((T) this.container.get()[i]))) {
+        for (int i = 0; i < this.underlyingArray.length; i++) {
+            if (o!= null && o.equals(((T) this.underlyingArray[i])) ||
+                    (o == null && this.underlyingArray[i] == null)) {
                 return true;
             }
         }
@@ -35,43 +38,50 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public Object[] toArray() {
-        Object[] newArray = new Object[container.get().length];
-        System.arraycopy(container.get(), 0, newArray, 0, container.get().length);
+        Object[] newArray = new Object[this.arraySize];
+        System.arraycopy(underlyingArray, 0, newArray, 0, this.arraySize);
         return newArray;
     }
 
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        System.arraycopy(container.get(), 0, a, 0, container.get().length);
+        System.arraycopy(underlyingArray, 0, a, 0, this.arraySize);
         return a;
     }
 
     @Override
     public boolean add(T newObject) {
-        int currentArraySize = this.container.get().length;
-        T[] newArray = (T[]) new Object[currentArraySize + 1];
-        System.arraycopy(this.container.get(), 0, newArray, 0, currentArraySize);
-        newArray[currentArraySize] = newObject;
-        this.container = new ArrayContainer<>(newArray);
+        int currentArrayLength = this.underlyingArray.length;
+        if (this.arraySize >= currentArrayLength ) {
+            T[] newArray = (T[]) new Object[currentArrayLength + MARGIN];
+            System.arraycopy(this.underlyingArray, 0, newArray, 0, currentArrayLength);
+            newArray[currentArrayLength] = newObject;
+            this.underlyingArray = newArray;
+        } else {
+            this.underlyingArray[this.arraySize] = newObject;
+        }
 
+        this.arraySize++;
         return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        Object[] newArray = new Object[container.get().length - 1];
         boolean found = false;
-        int j = 0;
-        for (int i = 0; i < container.get().length; i++) {
-            if (!o.equals((container.get()[i]))) {
-                newArray[j++] = container.get()[i];
-            } else {
-                found = true;
+
+        for (int i = 0; i < underlyingArray.length - 1; i++) {
+            if (o.equals(underlyingArray[i]) || found) {
+                if (i == arraySize) {
+                    underlyingArray[i] = null;
+                } else {
+                    underlyingArray[i] = underlyingArray[i + 1];
+                    found = true;
+                }
             }
         }
 
         if (found) {
-            container.set((T[]) newArray);
+            this.arraySize--;
         }
 
         return found;
@@ -89,73 +99,75 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        Object[] newArray = new Object[container.get().length + c.size()];
-        System.arraycopy(container.get(), 0, newArray, 0, container.get().length);
-        System.arraycopy(c.toArray(), 0, newArray, container.get().length, c.size());
-        container.set((T[]) newArray);
+        for (T newItem: c){
+            this.add(newItem);
+        }
 
         return c.size() > 0;
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        Object[] newArray = new Object[container.get().length + c.size()];
+        Object[] newArray = new Object[this.arraySize + c.size()];
 
-        T[] originalArray = (T[]) new Object[container.get().length];
+        T[] originalArray = (T[]) new Object[this.arraySize];
 
-        System.arraycopy(container.get(), 0, originalArray, 0, container.get().length);
-        System.arraycopy(container.get(), 0, newArray, 0, container.get().length);
+        System.arraycopy(underlyingArray, 0, originalArray, 0, this.arraySize);
+        System.arraycopy(underlyingArray, 0, newArray, 0, this.arraySize);
 
         System.arraycopy(c.toArray(), 0, newArray, index, c.size());
 
         System.arraycopy(originalArray, index, newArray, index + c.size(), originalArray.length - index);
 
-        container.set((T[]) newArray);
+        this.underlyingArray = (T[]) newArray;
+        this.arraySize = this.arraySize + c.size();
 
         return c.size() > 0;
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        int initialSize = this.container.get().length;
+        int initialSize = this.underlyingArray.length;
+        Object[] cArray = c.toArray();
         for (int i = 0; i < c.size(); i++) {
-             this.remove(c.toArray()[i]);
+            this.remove(cArray[i]);
         }
 
-        int sizeAfterDelete = this.container.get().length;
+        int sizeAfterDelete = this.underlyingArray.length;
 
         return initialSize != sizeAfterDelete;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        int initialSize = this.container.get().length;
+        int initialSize = this.arraySize;
 
-        for (T item : this.container.get()) {
-            if (!c.contains(item)) {
+        for (T item : this.underlyingArray) {
+            if (item != null && !c.contains(item)) {
                 this.remove(item);
             }
         }
 
-        int sizeAfterDelete = this.container.get().length;
+        int sizeAfterDelete = this.arraySize;
 
         return initialSize != sizeAfterDelete;
     }
 
     @Override
     public void clear() {
-        this.container.set((T[]) new Object[0]);
+        this.underlyingArray = (T[]) new Object[0];
+        this.arraySize = 0;
     }
 
     @Override
     public T get(int index) {
-        return this.container.get()[index];
+        return this.underlyingArray[index];
     }
 
     @Override
     public T set(int index, T element) {
-        T elementToReplace = container.get()[index];
-        container.get()[index] = element;
+        T elementToReplace = underlyingArray[index];
+        underlyingArray[index] = element;
         return elementToReplace;
     }
 
@@ -171,7 +183,7 @@ public class MyArrayList<T> implements List<T> {
         T itemToRemove = null;
         while (removeIterator.hasNext()) {
             if (i == index) {
-                itemToRemove = this.container.get()[i];
+                itemToRemove = this.underlyingArray[i];
                 removeIterator.remove();
             }
         }
@@ -182,8 +194,8 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public int indexOf(Object o) {
         int index = 0;
-        for (int i = 0; i < this.container.get().length; i++) {
-            if (((T) o).equals(this.container.get()[i])) {
+        for (int i = 0; i < this.underlyingArray.length; i++) {
+            if (((T) o).equals(this.underlyingArray[i])) {
                 index = i;
             }
         }
@@ -194,8 +206,8 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public int lastIndexOf(Object o) {
         int lastIndex = 0;
-        for (int i = this.container.get().length - 1; i > 0; i--) {
-            if (((T) o).equals(this.container.get()[i])) {
+        for (int i = this.underlyingArray.length - 1; i > 0; i--) {
+            if (((T) o).equals(this.underlyingArray[i])) {
                 lastIndex = i;
             }
         }
@@ -217,7 +229,7 @@ public class MyArrayList<T> implements List<T> {
     public List<T> subList(int fromIndex, int toIndex) {
         T[] newArray = (T[]) new Object[toIndex - fromIndex];
 
-        System.arraycopy(container.get(), fromIndex, newArray, 0, toIndex - fromIndex);
+        System.arraycopy(underlyingArray, fromIndex, newArray, 0, toIndex - fromIndex);
         return Arrays.asList(newArray);
     }
 
@@ -225,12 +237,12 @@ public class MyArrayList<T> implements List<T> {
         private int position = 0;
 
         public boolean hasNext() {
-            return (position < container.get().length - 1);
+            return (position < underlyingArray.length - 1);
         }
 
         public T next() {
             if (this.hasNext())
-                return container.get()[position++];
+                return underlyingArray[position++];
             else
                 throw new NoSuchElementException();
         }
@@ -255,13 +267,13 @@ public class MyArrayList<T> implements List<T> {
 
         @Override
         public boolean hasNext() {
-            return position < container.get().length - 1;
+            return position < underlyingArray.length - 1;
         }
 
         @Override
         public Object next() {
             if (this.hasNext()) {
-                return container.get()[++position];
+                return underlyingArray[++position];
             } else {
                 throw new NoSuchElementException();
             }
@@ -276,7 +288,7 @@ public class MyArrayList<T> implements List<T> {
         @Override
         public Object previous() {
             if (this.hasPrevious())
-                return container.get()[position--];
+                return underlyingArray[position--];
             else
                 return null;
         }
@@ -311,25 +323,5 @@ public class MyArrayList<T> implements List<T> {
         public void add(Object o) {
             MyArrayList.this.add((T) o);
         }
-    }
-}
-
-final class ArrayContainer<T> {
-    private T[] underlyingArray;
-
-    public ArrayContainer(T[] underlyingArray) {
-        this.underlyingArray = underlyingArray;
-    }
-
-    public ArrayContainer() {
-        this.underlyingArray = (T[]) new Object[0];
-    }
-
-    public T[] get() {
-        return underlyingArray;
-    }
-
-    public void set(T[] underlyingArray) {
-        this.underlyingArray = underlyingArray;
     }
 }

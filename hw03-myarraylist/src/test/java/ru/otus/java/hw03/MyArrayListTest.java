@@ -362,4 +362,14 @@ public class MyArrayListTest {
         assertEquals(6, list.get(5).intValue());
     }
 
+    @Test
+    public void containsNull() {
+        List<Sample> list = new MyArrayList<>();
+        Sample sample1 = new Sample("One", 1L, new Date());
+        list.add(null);
+        list.add(sample1);
+
+        assertTrue(list.contains(null));
+    }
+
 }
