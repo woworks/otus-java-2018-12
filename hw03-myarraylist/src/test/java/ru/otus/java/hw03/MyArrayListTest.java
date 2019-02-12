@@ -113,6 +113,7 @@ public class MyArrayListTest {
         list.add(sample3);
 
         list.remove(sample2);
+        list.remove(null);
 
         assertEquals(2, list.size());
         assertEquals(sample1, list.get(0));
@@ -372,4 +373,77 @@ public class MyArrayListTest {
         assertTrue(list.contains(null));
     }
 
+    @Test
+    public void indexOf() {
+        List<Integer> list = new MyArrayList<>();
+        list.add(3);
+        list.add(4);
+        list.add(null);
+        list.add(6);
+        list.add(1);
+        list.add(2);
+        list.add(4);
+
+        int nullIndex = list.indexOf(null);
+        int fourIndex = list.indexOf(4);
+        int nineIndex = list.indexOf(9);
+
+        assertEquals(2, nullIndex);
+        assertEquals(1, fourIndex);
+        assertEquals(-1, nineIndex);
+    }
+
+    @Test
+    public void lastIndexOf() {
+        List<Integer> list = new MyArrayList<>();
+        list.add(3);
+        list.add(4);
+        list.add(null);
+        list.add(6);
+        list.add(1);
+        list.add(2);
+        list.add(4);
+
+        int nullIndex = list.lastIndexOf(null);
+        int fourIndex = list.lastIndexOf(4);
+        int nineIndex = list.lastIndexOf(9);
+
+        assertEquals(2, nullIndex);
+        assertEquals(6, fourIndex);
+        assertEquals(-1, nineIndex);
+    }
+
+
+    @Test
+    public void set() {
+        List<Integer> list = new MyArrayList<>();
+        list.add(3);
+        list.set(0, 4);
+        assertEquals(4 ,list.get(0).intValue());
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void setOutOfSize() {
+        List<Integer> list = new MyArrayList<>();
+        list.add(3);
+        list.set(1, 4);
+    }
+
+    @Test
+    public void removeByIndex() {
+        Sample sample1 = new Sample("One", 1L, new Date());
+        Sample sample2 = new Sample("Two", 2L, new Date());
+        Sample sample3 = new Sample("Three", 3L, new Date());
+
+        List<Sample> list = new MyArrayList<>();
+        list.add(sample1);
+        list.add(sample2);
+        list.add(sample3);
+
+        list.remove(1);
+
+        assertEquals(2, list.size());
+        assertEquals(sample1, list.get(0));
+        assertEquals(sample3, list.get(1));
+    }
 }
