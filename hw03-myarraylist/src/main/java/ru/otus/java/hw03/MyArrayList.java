@@ -4,15 +4,13 @@ import java.util.*;
 
 public class MyArrayList<T> implements List<T> {
 
-     private static final int MARGIN = 5;
+    private static final int MARGIN = 5;
     private T[] underlyingArray = (T[]) new Object[MARGIN];
-    private int arraySize = 0;
-
-    private MyArrayIterator iterator = new MyArrayIterator();
+    private int listSize = 0;
 
     @Override
     public int size() {
-        return this.arraySize;
+        return this.listSize;
     }
 
     @Override
@@ -38,30 +36,30 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public Object[] toArray() {
-        Object[] newArray = new Object[this.arraySize];
-        System.arraycopy(underlyingArray, 0, newArray, 0, this.arraySize);
+        Object[] newArray = new Object[this.listSize];
+        System.arraycopy(underlyingArray, 0, newArray, 0, this.listSize);
         return newArray;
     }
 
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        System.arraycopy(underlyingArray, 0, a, 0, this.arraySize);
+        System.arraycopy(underlyingArray, 0, a, 0, this.listSize);
         return a;
     }
 
     @Override
     public boolean add(T newObject) {
         int currentArrayLength = this.underlyingArray.length;
-        if (this.arraySize >= currentArrayLength ) {
+        if (this.listSize >= currentArrayLength ) {
             T[] newArray = (T[]) new Object[currentArrayLength + MARGIN];
             System.arraycopy(this.underlyingArray, 0, newArray, 0, currentArrayLength);
             newArray[currentArrayLength] = newObject;
             this.underlyingArray = newArray;
         } else {
-            this.underlyingArray[this.arraySize] = newObject;
+            this.underlyingArray[this.listSize] = newObject;
         }
 
-        this.arraySize++;
+        this.listSize++;
         return true;
     }
 
@@ -70,8 +68,8 @@ public class MyArrayList<T> implements List<T> {
         boolean found = false;
 
         for (int i = 0; i < underlyingArray.length - 1; i++) {
-            if (o.equals(underlyingArray[i]) || found) {
-                if (i == arraySize) {
+            if (o != null && o.equals(underlyingArray[i]) || found) {
+                if (i == listSize) {
                     underlyingArray[i] = null;
                 } else {
                     underlyingArray[i] = underlyingArray[i + 1];
@@ -81,7 +79,7 @@ public class MyArrayList<T> implements List<T> {
         }
 
         if (found) {
-            this.arraySize--;
+            this.listSize--;
         }
 
         return found;
@@ -108,19 +106,19 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        Object[] newArray = new Object[this.arraySize + c.size()];
+        Object[] newArray = new Object[this.listSize + c.size()];
 
-        T[] originalArray = (T[]) new Object[this.arraySize];
+        T[] originalArray = (T[]) new Object[this.listSize];
 
-        System.arraycopy(underlyingArray, 0, originalArray, 0, this.arraySize);
-        System.arraycopy(underlyingArray, 0, newArray, 0, this.arraySize);
+        System.arraycopy(underlyingArray, 0, originalArray, 0, this.listSize);
+        System.arraycopy(underlyingArray, 0, newArray, 0, this.listSize);
 
         System.arraycopy(c.toArray(), 0, newArray, index, c.size());
 
         System.arraycopy(originalArray, index, newArray, index + c.size(), originalArray.length - index);
 
         this.underlyingArray = (T[]) newArray;
-        this.arraySize = this.arraySize + c.size();
+        this.listSize = this.listSize + c.size();
 
         return c.size() > 0;
     }
@@ -140,7 +138,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        int initialSize = this.arraySize;
+        int initialSize = this.listSize;
 
         for (T item : this.underlyingArray) {
             if (item != null && !c.contains(item)) {
@@ -148,7 +146,7 @@ public class MyArrayList<T> implements List<T> {
             }
         }
 
-        int sizeAfterDelete = this.arraySize;
+        int sizeAfterDelete = this.listSize;
 
         return initialSize != sizeAfterDelete;
     }
@@ -156,7 +154,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public void clear() {
         this.underlyingArray = (T[]) new Object[0];
-        this.arraySize = 0;
+        this.listSize = 0;
     }
 
     @Override
@@ -166,6 +164,8 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T set(int index, T element) {
+        if (index >= this.listSize)
+            throw new IndexOutOfBoundsException("List size is " + this.listSize + "; index = " + index);
         T elementToReplace = underlyingArray[index];
         underlyingArray[index] = element;
         return elementToReplace;
@@ -178,25 +178,39 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T remove(int index) {
-        Iterator removeIterator = this.listIterator();
-        int i = 0;
-        T itemToRemove = null;
-        while (removeIterator.hasNext()) {
-            if (i == index) {
-                itemToRemove = this.underlyingArray[i];
-                removeIterator.remove();
+        if (index >= this.listSize)
+            throw new IndexOutOfBoundsException("List size is " + this.listSize + "; index = " + index);
+
+        boolean found = false;
+        T foundObject = null;
+
+        for (int i = 0; i < underlyingArray.length - 1; i++) {
+            if (i == index || found) {
+                if (i == listSize) {
+                    underlyingArray[i] = null;
+                } else {
+                    foundObject = underlyingArray[i];
+                    underlyingArray[i] = underlyingArray[i + 1];
+                    found = true;
+                }
             }
         }
 
-        return itemToRemove;
+        if (found) {
+            this.listSize--;
+        }
+
+        return foundObject;
     }
 
     @Override
     public int indexOf(Object o) {
-        int index = 0;
-        for (int i = 0; i < this.underlyingArray.length; i++) {
-            if (((T) o).equals(this.underlyingArray[i])) {
+        int index = -1;
+        for (int i = 0; i < this.listSize; i++) {
+            if (o != null && o.equals(this.underlyingArray[i])
+            || (o == null && this.underlyingArray[i] == null)) {
                 index = i;
+                break;
             }
         }
 
@@ -205,10 +219,12 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(Object o) {
-        int lastIndex = 0;
-        for (int i = this.underlyingArray.length - 1; i > 0; i--) {
-            if (((T) o).equals(this.underlyingArray[i])) {
+        int lastIndex = -1;
+        for (int i = this.listSize - 1; i > 0; i--) {
+            if (o!=null && o.equals(this.underlyingArray[i])
+                    || (o == null && this.underlyingArray[i] == null)) {
                 lastIndex = i;
+                break;
             }
         }
 
