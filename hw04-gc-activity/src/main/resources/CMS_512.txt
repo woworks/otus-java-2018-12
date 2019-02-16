@@ -1,0 +1,24 @@
+-------------------OutOfMemoryError!-------------------
+-------------------That's all folks!-------------------
+=======================GC Stats========================
+name of memory manager:ParNew
+Collection Time:603
+Collection Count:8
+Par Eden Space
+Par Eden Space
+name of memory manager:ConcurrentMarkSweep
+Collection Time:4702
+Collection Count:34
+Par Eden Space
+Par Eden Space
+Par Eden Space
+====================Memory Pools Stats=====================
+:: Pool name ::                     .:Usage:.
+Code Cache                           1902 Kb
+Metaspace                            4659 Kb
+Compressed Class Space                506 Kb
+Par Eden Space                     110009 Kb
+Par Survivor Space                      0 Kb
+CMS Old Gen                        349567 Kb
+Number of list items that were added before the crash: 6153400
+Time taken: 254sec

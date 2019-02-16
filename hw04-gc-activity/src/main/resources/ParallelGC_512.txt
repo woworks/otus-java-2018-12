@@ -1,0 +1,24 @@
+-------------------OutOfMemoryError!-------------------
+-------------------That's all folks!-------------------
+=======================GC Stats========================
+name of memory manager:PS Scavenge
+Collection Time:252
+Collection Count:5
+PS Eden Space
+PS Eden Space
+name of memory manager:PS MarkSweep
+Collection Time:9457
+Collection Count:6
+PS Eden Space
+PS Eden Space
+PS Eden Space
+====================Memory Pools Stats=====================
+:: Pool name ::                     .:Usage:.
+Code Cache                           1909 Kb
+Metaspace                            4663 Kb
+Compressed Class Space                506 Kb
+PS Eden Space                      109705 Kb
+PS Survivor Space                       0 Kb
+PS Old Gen                         349416 Kb
+Number of list items that were added before the crash: 6153400
+Time taken: 259sec
