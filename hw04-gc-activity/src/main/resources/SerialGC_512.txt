@@ -1,0 +1,24 @@
+-------------------OutOfMemoryError!-------------------
+-------------------That's all folks!-------------------
+=======================GC Stats========================
+name of memory manager:Copy
+Collection Time:474
+Collection Count:6
+Eden Space
+Eden Space
+name of memory manager:MarkSweepCompact
+Collection Time:2086
+Collection Count:4
+Eden Space
+Eden Space
+Eden Space
+====================Memory Pools Stats=====================
+:: Pool name ::                     .:Usage:.
+Code Cache                           1938 Kb
+Metaspace                            4667 Kb
+Compressed Class Space                506 Kb
+Eden Space                         110000 Kb
+Survivor Space                          0 Kb
+Tenured Gen                        349567 Kb
+Number of list items that were added before the crash: 6153400
+Time taken: 252sec
