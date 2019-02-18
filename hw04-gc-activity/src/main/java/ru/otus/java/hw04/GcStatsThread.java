@@ -10,7 +10,7 @@ public class GcStatsThread extends Thread {
     @Override
     public void run() {
 
-        while (!Main.isCrashed()) {
+        while (true) {
             displayStats();
         }
     }
