@@ -1,0 +1,24 @@
+-------------------OutOfMemoryError!-------------------
+-------------------That's all folks!-------------------
+=======================GC Stats========================
+name of memory manager:G1 Young Generation
+Collection Time:1702
+Collection Count:43
+G1 Eden Space
+G1 Eden Space
+name of memory manager:G1 Old Generation
+Collection Time:10257
+Collection Count:13
+G1 Eden Space
+G1 Eden Space
+G1 Eden Space
+====================Memory Pools Stats=====================
+:: Pool name ::                     .:Usage:.
+Code Cache                           1924 Kb
+Metaspace                            4668 Kb
+Compressed Class Space                506 Kb
+G1 Eden Space                           0 Kb
+G1 Survivor Space                       0 Kb
+G1 Old Gen                            874 Kb
+Number of list items that were added before the crash: 6905283
+Time taken: 294sec
