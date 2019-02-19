@@ -10,6 +10,7 @@ public class Main {
 
         List<LocalDateTime> list = new ArrayList<>();
         Thread statsThread = new GcStatsThread();
+        statsThread.setDaemon(true);
         statsThread.start();
         int j = 0;
         for (j = 0; j < Integer.MAX_VALUE; j++) {
