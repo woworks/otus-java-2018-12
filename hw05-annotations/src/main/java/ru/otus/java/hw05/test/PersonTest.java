@@ -25,26 +25,26 @@ public class PersonTest {
 
     @Test
     public void notNegativePersonIdTest() {
-        System.out.println("@Test:: notNegativePersonIdTest: person.getId = " + person.getId());
+        System.out.println("   @Test:: notNegativePersonIdTest: person.getId = " + person.getId());
         Assert.isNotNegative(person.getId());
     }
 
     @Test
     public void notNullPersonTest() {
-        System.out.println("@Test:: NotNullPersonTest");
+        System.out.println("   @Test:: NotNullPersonTest");
         Assert.isNotNull(person);
     }
 
     @Test
     public void goodEmailTest() {
-        System.out.println("@Test:: goodEmailTest");
+        System.out.println("   @Test:: goodEmailTest");
         String emailRegex = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
         Assert.matchPattern(emailRegex, person.getEmail());
     }
 
     @Test
     public void correctAgeTest () {
-        System.out.println("@Test:: correctAgeTest");
+        System.out.println("   @Test:: correctAgeTest");
         Assert.isNotNegative(person.getAge());
     }
 }

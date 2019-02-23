@@ -145,7 +145,7 @@ public final class ReflectionHelper {
         return returnMethod;
     }
 
-    public static void objectInfo(Class<PersonTest> type) {
+    public static void objectInfo(Class<? extends Object> type) {
         System.out.println();
         System.out.println(String.format("SimpleName     : %60s", type.getSimpleName()));
         System.out.println(String.format("Package Name   : %60s", type.getPackageName()));

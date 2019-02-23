@@ -1,7 +1,6 @@
 package ru.otus.java.hw05.tester;
 
 import ru.otus.java.hw05.reflection.ReflectionHelper;
-import ru.otus.java.hw05.test.PersonTest;
 import ru.otus.java.hw05.test.TestFrameworkException;
 
 import java.lang.reflect.Method;
@@ -9,21 +8,21 @@ import java.util.List;
 
 public class TesterRunner {
 
-    public static void runTest(Class<PersonTest> type) {
+    public static void runTest(Class<? extends Object> type) {
 
         ReflectionHelper.objectInfo(type);
-        PersonTest personTestSourceObject = new PersonTest();
+        Object testSourceObject = ReflectionHelper.instantiate(type);
 
         try {
-            List<Method> testMethods = ReflectionHelper.getTestMethods(personTestSourceObject);
-            Method beforeMethod = ReflectionHelper.getBeforeMethod(personTestSourceObject);
-            Method afterMethod = ReflectionHelper.getAfterMethod(personTestSourceObject);
+            List<Method> testMethods = ReflectionHelper.getTestMethods(testSourceObject);
+            Method beforeMethod = ReflectionHelper.getBeforeMethod(testSourceObject);
+            Method afterMethod = ReflectionHelper.getAfterMethod(testSourceObject);
 
             for (Method method : testMethods) {
-                PersonTest personTest = new PersonTest();
-                ReflectionHelper.callMethod(personTest, beforeMethod.getName());
-                ReflectionHelper.callMethod(personTest, method.getName());
-                ReflectionHelper.callMethod(personTest, afterMethod.getName());
+                Object testObject = ReflectionHelper.instantiate(type);
+                ReflectionHelper.callMethod(testObject, beforeMethod.getName());
+                ReflectionHelper.callMethod(testObject, method.getName());
+                ReflectionHelper.callMethod(testObject, afterMethod.getName());
             }
 
         } catch (TestFrameworkException e) {
