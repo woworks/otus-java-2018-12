@@ -1,6 +1,8 @@
 package ru.otus.java.hw05.reflection;
 
-import ru.otus.java.hw05.test.PersonTest;
+import ru.otus.java.hw05.annotations.After;
+import ru.otus.java.hw05.annotations.Before;
+import ru.otus.java.hw05.annotations.Test;
 import ru.otus.java.hw05.test.TestFrameworkException;
 
 import java.lang.annotation.Annotation;
@@ -89,9 +91,9 @@ public final class ReflectionHelper {
         return null;
     }
 
-    public static boolean hasAnnotation(Method method, String annotation) {
+    public static boolean hasAnnotation(Method method, Class annotationClass) {
         for (Annotation ann : method.getDeclaredAnnotations()) {
-            if (ann.annotationType().getSimpleName().compareTo(annotation) == 0) {
+            if (ann.annotationType().equals(annotationClass)) {
                 return true;
             }
         }
@@ -109,38 +111,38 @@ public final class ReflectionHelper {
 //        return classes;
     }
 
-    public static List<Method> getTestMethods(Object object) {
+    public static List<Method> getTestMethods(Class object) {
         List<Method> testMethods = new ArrayList<>();
-        for (Method method : object.getClass().getMethods()) {
-            if (hasAnnotation(method, "Test")) {
+        for (Method method : object.getMethods()) {
+            if (hasAnnotation(method, Test.class)) {
                 testMethods.add(method);
             }
         }
         return testMethods;
     }
 
-    public static Method getBeforeMethod(Object object) throws TestFrameworkException {
-        return getSingleAnnotation(object, "Before");
+    public static Method getBeforeMethod(Class objectClass) throws TestFrameworkException {
+        return getSingleAnnotation(objectClass, Before.class);
     }
 
-    public static Method getAfterMethod(Object object) throws TestFrameworkException {
-        return getSingleAnnotation(object, "After");
+    public static Method getAfterMethod(Class objectClass) throws TestFrameworkException {
+        return getSingleAnnotation(objectClass, After.class);
 
     }
 
-    public static Method getSingleAnnotation(Object object, String annotationName) throws TestFrameworkException {
+    public static Method getSingleAnnotation(Class object, Class annotationClass) throws TestFrameworkException {
         int count = 0;
         Method returnMethod = null;
-        for (Method method : object.getClass().getMethods()) {
-            if (hasAnnotation(method, annotationName)) {
+        for (Method method : object.getMethods()) {
+            if (hasAnnotation(method, annotationClass)) {
                 returnMethod = method;
                 count++;
             }
         }
         if (count > 1) {
-            throw new TestFrameworkException("Cannot be more than one '" + annotationName + "' annotation");
+            throw new TestFrameworkException("Cannot be more than one '" + annotationClass + "' annotation");
         } else if (count == 0) {
-            throw new TestFrameworkException("There is no '" + annotationName + "' annotation");
+            throw new TestFrameworkException("There is no '" + annotationClass + "' annotation");
         }
         return returnMethod;
     }

@@ -11,12 +11,11 @@ public class TesterRunner {
     public static void runTest(Class<? extends Object> type) {
 
         ReflectionHelper.objectInfo(type);
-        Object testSourceObject = ReflectionHelper.instantiate(type);
 
         try {
-            List<Method> testMethods = ReflectionHelper.getTestMethods(testSourceObject);
-            Method beforeMethod = ReflectionHelper.getBeforeMethod(testSourceObject);
-            Method afterMethod = ReflectionHelper.getAfterMethod(testSourceObject);
+            List<Method> testMethods = ReflectionHelper.getTestMethods(type);
+            Method beforeMethod = ReflectionHelper.getBeforeMethod(type);
+            Method afterMethod = ReflectionHelper.getAfterMethod(type);
 
             for (Method method : testMethods) {
                 Object testObject = ReflectionHelper.instantiate(type);
