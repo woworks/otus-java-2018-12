@@ -7,9 +7,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Function;
 
-/**
- * Created by woworks.
- */
 public class SoftCacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private static final int TIME_THRESHOLD_MS = 5;
 
@@ -18,7 +15,7 @@ public class SoftCacheEngineImpl<K, V> implements CacheEngine<K, V> {
     private final long idleTimeMs;
     private final boolean isEternal;
 
-    private final Map<SoftReference<K>, MyElement<K, V>> elements = new LinkedHashMap<>();
+    private final Map<K, SoftReference<MyElement<K, V>>> elements = new LinkedHashMap<>();
     private final Timer timer = new Timer();
 
     private int hit = 0;
@@ -32,14 +29,15 @@ public class SoftCacheEngineImpl<K, V> implements CacheEngine<K, V> {
     }
 
     public void put(MyElement<K, V> element) {
+        // if elements reached max elements - make room for new element - remove one element
         if (elements.size() == maxElements) {
-
-            K firstKey = elements.keySet().iterator().next().get();
+            K firstKey = elements.keySet().iterator().next();
             elements.remove(firstKey);
         }
 
         K key = element.getKey();
-        elements.put(new SoftReference<>(key), element);
+        // softify element and put into the elements map
+        elements.put(key, new SoftReference<>(element));
 
         if (!isEternal) {
             if (lifeTimeMs != 0) {
@@ -54,13 +52,27 @@ public class SoftCacheEngineImpl<K, V> implements CacheEngine<K, V> {
     }
 
     public MyElement<K, V> get(K key) {
-        MyElement<K, V> element = elements.get(new SoftReference<>(key));
-        if (element != null) {
-            hit++;
-            element.setAccessed();
+        MyElement<K, V> element = null;
+        SoftReference softReference = elements.get(key);
+        // if key exists in the elements map
+        if (softReference != null) {
+            element = (MyElement<K, V>) softReference.get();
+            // and if reference points to the object that is still alive
+            // we can consider element as item from cache
+            if (element != null) {
+                hit++;
+                element.setAccessed();
+            // GC removed object from memory, we have useless entry
+            // removing this entry from the map
+            } else {
+                elements.remove(key);
+                miss++;
+            }
+        // no item was found in elements map for the given key
         } else {
             miss++;
         }
+
         return element;
     }
 
@@ -81,15 +93,22 @@ public class SoftCacheEngineImpl<K, V> implements CacheEngine<K, V> {
         return new TimerTask() {
             @Override
             public void run() {
-                MyElement<K, V> element = elements.get(key);
-                if (element == null || isT1BeforeT2(timeFunction.apply(element), System.currentTimeMillis())) {
-                    elements.remove(key);
-                    this.cancel();
+                MyElement<K, V> element = null;
+
+                SoftReference softReference = elements.get(key);
+                // check if we still have reference to the map entry
+                if (softReference != null) {
+                    element = (MyElement<K, V>) softReference.get();
+                    if (element == null || isT1BeforeT2(timeFunction.apply(element), System.currentTimeMillis())) {
+                        elements.remove(key);
+                        this.cancel();
+                    }
                 }
+
+
             }
         };
     }
-
 
     private boolean isT1BeforeT2(long t1, long t2) {
         return t1 < t2 + TIME_THRESHOLD_MS;

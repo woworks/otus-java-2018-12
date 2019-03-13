@@ -41,4 +41,9 @@ public class MyElement<K, V> {
     public void setAccessed() {
         lastAccessTime = getCurrentTime();
     }
+
+    @Override
+    public void finalize() {
+        System.out.println(">>>>>>>>>>>>>>>: '" + this.key + "' will be GC'ed!");
+    }
 }
