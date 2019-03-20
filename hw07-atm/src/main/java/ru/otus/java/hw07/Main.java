@@ -8,14 +8,10 @@ import java.util.InputMismatchException;
 public class Main {
     public static void main(String[] args) {
 
-        User user = new User();
-        user.setFirstName("Jack");
-        user.setFirstName("Doe");
-        user.setCardNo("1234 5678 1234 5678");
-        user.setPin("1111");
-        user.setBalance(new CashAmount(100));
+        AtmStorage atm = new AtmStorage();
+        atm.initBalance();
 
-        AtmProcessor processor = new AtmProcessorImpl(user);
+        AtmProcessor processor = new AtmProcessorImpl(atm);
         int choice = 100;
         while (choice != 0) {
 

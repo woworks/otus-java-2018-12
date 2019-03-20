@@ -10,26 +10,23 @@ class CashAmountTest {
 
     @Test
     void getBanknotes() {
-        CashAmount cashAmount = new CashAmount(253);
 
-        Map<CashAmount.Banknote, Integer> banknotes = cashAmount.getBanknotes();
+        Map<AtmStorage.Banknote, Integer> banknotes = AtmStorage.calculateBanknotes(253);
 
         assertEquals(3, banknotes.keySet().size());
 
-        assertEquals(2, banknotes.get(CashAmount.Banknote.ONE_HUNDRED).intValue());
-        assertEquals(1, banknotes.get(CashAmount.Banknote.FIFTY).intValue());
-        assertEquals(3, banknotes.get(CashAmount.Banknote.ONE).intValue());
+        assertEquals(2, banknotes.get(AtmStorage.Banknote.ONE_HUNDRED).intValue());
+        assertEquals(1, banknotes.get(AtmStorage.Banknote.FIFTY).intValue());
+        assertEquals(3, banknotes.get(AtmStorage.Banknote.ONE).intValue());
 
-        cashAmount.setValue(388);
-        banknotes = cashAmount.getBanknotes();
+        banknotes = AtmStorage.calculateBanknotes(388);
 
-
-        assertEquals(3, banknotes.get(CashAmount.Banknote.ONE_HUNDRED).intValue());
-        assertEquals(1, banknotes.get(CashAmount.Banknote.FIFTY).intValue());
-        assertEquals(1, banknotes.get(CashAmount.Banknote.TWENTY).intValue());
-        assertEquals(1, banknotes.get(CashAmount.Banknote.TEN).intValue());
-        assertEquals(1, banknotes.get(CashAmount.Banknote.FIVE).intValue());
-        assertEquals(3, banknotes.get(CashAmount.Banknote.ONE).intValue());
+        assertEquals(3, banknotes.get(AtmStorage.Banknote.ONE_HUNDRED).intValue());
+        assertEquals(1, banknotes.get(AtmStorage.Banknote.FIFTY).intValue());
+        assertEquals(1, banknotes.get(AtmStorage.Banknote.TWENTY).intValue());
+        assertEquals(1, banknotes.get(AtmStorage.Banknote.TEN).intValue());
+        assertEquals(1, banknotes.get(AtmStorage.Banknote.FIVE).intValue());
+        assertEquals(3, banknotes.get(AtmStorage.Banknote.ONE).intValue());
 
 
     }
