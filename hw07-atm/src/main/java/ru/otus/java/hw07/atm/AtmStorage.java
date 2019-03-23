@@ -6,29 +6,11 @@ import java.util.Map;
 
 public class AtmStorage {
 
-    enum Banknote {
-        ONE_HUNDRED(100), FIFTY(50), TWENTY(20), TEN(10), FIVE(5), ONE(1);
-
-        private int value;
-
-        Banknote(int value) {
-            this.value = value;
-        }
-
-        int getValue() {
-            return value;
-        }
-    }
-
-    public Map<Banknote, Integer> getStorageBanknotes() {
+    Map<Banknote, Integer> getStorageBanknotes() {
         return storageBanknotes;
     }
 
-    public void setStorageBanknotes(Map<Banknote, Integer> storageBanknotes) {
-        this.storageBanknotes = storageBanknotes;
-    }
-
-    Map<Banknote, Integer> storageBanknotes = new HashMap<>();
+    private final Map<Banknote, Integer> storageBanknotes = new HashMap<>();
 
 
     public void initBalance() {
@@ -38,7 +20,7 @@ public class AtmStorage {
         }
     }
 
-    Map<AtmStorage.Banknote, Integer> withdrawCash(int value) throws InsufficientFundsException {
+    Map<Banknote, Integer> withdrawCash(int value) throws InsufficientFundsException {
 
         // verify if atm has enough banknotes - dry run
         this.minusCash(value, true);
