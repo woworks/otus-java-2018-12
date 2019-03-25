@@ -4,9 +4,9 @@ import java.util.Map;
 
 public interface AtmProcessor {
 
-    void withdrawCash() throws InsufficientFundsException;
+    void withdrawCash(int amount) throws InsufficientFundsException;
 
-    void depositCash();
+    void depositCash(Map<Banknote, Integer> banknotesToDeposit);
 
     void checkBalance();
 

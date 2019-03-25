@@ -1,17 +1,14 @@
 package ru.otus.java.hw08.atm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AtmDepartment {
+
+    private List<AtmProcessor> atmProcessors = new ArrayList<>();
 
     public AtmDepartment(List<AtmProcessor> atmProcessors) {
         this.atmProcessors = atmProcessors;
     }
-
-    private List<AtmProcessor> atmProcessors = new ArrayList<>();
 
     Map<Banknote, Integer> getBalance() {
         Map<Banknote, Integer> totalBalance = new HashMap<>();
@@ -29,9 +26,31 @@ public class AtmDepartment {
     }
 
     public void displayBalance() {
+        System.out.println("Total ATM Department Balance: ");
+        for (AtmProcessor atm: this.atmProcessors){
+            atm.checkBalance();
+        }
     }
 
     public void generateUserAtmActivity() {
+        for (AtmProcessor atm: atmProcessors){
+            atm.depositCash(generateBanknotes());
+            int amount = new Random().nextInt(100);
+            try {
+                atm.withdrawCash(amount);
+            } catch (InsufficientFundsException e) {
+                System.out.println("Could not withdraw amount: " + amount);
+            }
+        }
+    }
+
+    private static Map<Banknote, Integer> generateBanknotes() {
+        Map<Banknote, Integer> banknotes = new HashMap<>();
+        for (int i = 0; i < Banknote.values().length; i++) {
+             banknotes.put(Banknote.values()[i], new Random().nextInt(10));
+        }
+
+        return banknotes;
     }
 
     public void reinitAtms() {
