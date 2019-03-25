@@ -2,25 +2,19 @@ package ru.otus.java.hw08.atm;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class AtmProcessorImpl implements AtmProcessor {
 
+    private Long id;
     private final AtmStorage atmStorage;
 
-    public AtmProcessorImpl(AtmStorage atmStorage) {
+    public AtmProcessorImpl(Long id, AtmStorage atmStorage) {
+        this.id = id;
         this.atmStorage = atmStorage;
     }
 
     @Override
-    public void withdrawCash() throws InsufficientFundsException {
-        int amount;
-        do {
-            System.out.print("Please correct input cash amount to withdraw: ");
-            Scanner sc = new Scanner(System.in);
-            amount = sc.nextInt();
-        } while (amount <= 0);
-
+    public void withdrawCash(int amount) throws InsufficientFundsException {
         Map<Banknote, Integer> banknotes = this.atmStorage.withdrawCash(amount);
 
         System.out.println("You'll get the following Banknotes: ");
@@ -30,23 +24,13 @@ public class AtmProcessorImpl implements AtmProcessor {
     }
 
     @Override
-    public void depositCash() {
+    public void depositCash(Map<Banknote, Integer> banknotesToDeposit) {
 
-        Map<Banknote, Integer> banknotesToDeposit = new HashMap<>();
-
-        System.out.println("Please correct input cash amount to deposit: ");
+        System.out.println("Will input cash amount to deposit: " + banknotesToDeposit);
 
         for (int i = 0; i < Banknote.values().length; i++) {
-
-            int amount;
-            do {
-                System.out.print("Put banknotes of amount " + Banknote.values()[i] + ": ");
-                Scanner sc = new Scanner(System.in);
-                amount = sc.nextInt();
-            } while (amount <= 0);
-
-            banknotesToDeposit.put(Banknote.values()[i], amount);
-
+            Banknote banknote = Banknote.values()[i];
+            banknotesToDeposit.put(banknote, banknotesToDeposit.get(banknote));
         }
 
         this.atmStorage.depositCash(banknotesToDeposit);
@@ -55,11 +39,12 @@ public class AtmProcessorImpl implements AtmProcessor {
 
     @Override
     public void checkBalance() {
-        System.out.println("ATM balance: ");
+        System.out.println("ATM #" + this.id + " balance: ");
         for (int i = 0; i < Banknote.values().length; i++) {
             Banknote banknote = Banknote.values()[i];
-            System.out.println(banknote + ": " + atmStorage.getStorageBanknotes().get(banknote));
+            System.out.print(banknote + ": [" + atmStorage.getStorageBanknotes().get(banknote) + "]; ");
         }
+        System.out.println("\n");
 
     }
 
@@ -72,5 +57,17 @@ public class AtmProcessorImpl implements AtmProcessor {
         }
 
         return balance;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public AtmStorage getAtmStorage() {
+        return atmStorage;
     }
 }

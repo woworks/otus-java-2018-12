@@ -1,4 +1,4 @@
-package ru.otus.java.hw07.atm;
+package ru.otus.java.hw08.atm;
 
 import org.junit.jupiter.api.Test;
 

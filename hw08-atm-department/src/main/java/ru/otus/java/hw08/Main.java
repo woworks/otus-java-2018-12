@@ -15,7 +15,7 @@ public class Main {
         for(int i = 0; i < 10; i++){
             AtmStorage atmStorage = new AtmStorage();
             atmStorage.initBalance();
-            AtmProcessor processor = new AtmProcessorImpl(atmStorage);
+            AtmProcessor processor = new AtmProcessorImpl((long)i, atmStorage);
             atms.add(processor);
         }
 
