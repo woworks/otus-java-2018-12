@@ -20,6 +20,10 @@ public class AtmStorage {
         }
     }
 
+    void clearBalance() {
+        this.storageBanknotes.clear();
+    }
+
     Map<Banknote, Integer> withdrawCash(int value) throws InsufficientFundsException {
 
         // verify if atm has enough banknotes - dry run

@@ -24,6 +24,11 @@ public class AtmProcessorImpl implements AtmProcessor {
     }
 
     @Override
+    public void clearCash() {
+        this.atmStorage.clearBalance();
+    }
+
+    @Override
     public void depositCash(Map<Banknote, Integer> banknotesToDeposit) {
 
         System.out.println("Will input cash amount to deposit: " + banknotesToDeposit);
