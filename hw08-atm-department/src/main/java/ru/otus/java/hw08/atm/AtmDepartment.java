@@ -4,10 +4,19 @@ import java.util.*;
 
 public class AtmDepartment {
 
-    private List<AtmProcessor> atmProcessors = new ArrayList<>();
+    private List<AtmProcessor> atmProcessors;
 
     public AtmDepartment(List<AtmProcessor> atmProcessors) {
         this.atmProcessors = atmProcessors;
+    }
+
+
+    public Map<Long, Map<Banknote, Integer>> getBalanceByAtm() {
+        Map<Long, Map<Banknote, Integer>> atmsBalance = new HashMap<>();
+        for (AtmProcessor processor: atmProcessors) {
+            atmsBalance.put(processor.getId(), processor.getBalance());
+        }
+        return atmsBalance;
     }
 
     Map<Banknote, Integer> getBalance() {
@@ -53,6 +62,10 @@ public class AtmDepartment {
         return banknotes;
     }
 
-    public void reinitAtms() {
+    public void restoreAtmsState(AtmMemento memento) {
+        for (AtmProcessor atmProcessor: atmProcessors){
+            atmProcessor.clearCash();
+            atmProcessor.depositCash(memento.getState().get(atmProcessor.getId()));
+        }
     }
 }

@@ -21,6 +21,9 @@ public class Main {
 
         AtmDepartment atmDepartment = new AtmDepartment(atms);
 
+        AtmStateSaver atmStateSaver = new AtmStateSaver();
+        atmStateSaver.setMemento(new AtmMemento(atmDepartment.getBalanceByAtm()));
+
 
         int choice = 100;
         while (choice != 0) {
@@ -36,7 +39,7 @@ public class Main {
                         atmDepartment.generateUserAtmActivity();
                         break;
                     case 3:
-                        atmDepartment.reinitAtms();
+                        atmDepartment.restoreAtmsState(atmStateSaver.getMemento());
                         break;
                     case 0:
                         System.out.println("Exiting..");
