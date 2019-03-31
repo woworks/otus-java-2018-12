@@ -6,15 +6,17 @@ public class AtmDepartment {
 
     private List<AtmProcessor> atmProcessors;
 
+    AtmStateSaver atmStateSaver = new AtmStateSaver();
+
     public AtmDepartment(List<AtmProcessor> atmProcessors) {
         this.atmProcessors = atmProcessors;
     }
 
 
-    public Map<Long, Map<Banknote, Integer>> getBalanceByAtm() {
-        Map<Long, Map<Banknote, Integer>> atmsBalance = new HashMap<>();
+    public Map<Long, AtmMemento> getBalanceByAtm() {
+        Map<Long, AtmMemento> atmsBalance = new HashMap<>();
         for (AtmProcessor processor: atmProcessors) {
-            atmsBalance.put(processor.getId(), processor.getBalance());
+            atmsBalance.put(processor.getId(), new AtmMemento(processor.getBalance()));
         }
         return atmsBalance;
     }
@@ -62,10 +64,16 @@ public class AtmDepartment {
         return banknotes;
     }
 
-    public void restoreAtmsState(AtmMemento memento) {
+    public void restoreAtmsState() {
+        AtmStates states = atmStateSaver.getMemento();
         for (AtmProcessor atmProcessor: atmProcessors){
             atmProcessor.clearCash();
-            atmProcessor.depositCash(memento.getState().get(atmProcessor.getId()));
+            atmProcessor.depositCash(states.getStateByAtmId(atmProcessor.getId()));
         }
     }
+
+    public void saveAtmsState() {
+         atmStateSaver.setStates(new AtmStates(this.getBalanceByAtm()));
+    }
+
 }

@@ -54,8 +54,8 @@ public class AtmStorage {
         for (Map.Entry<Banknote, Integer> entry : banknotes.entrySet()) {
             Banknote banknote = entry.getKey();
             int number = entry.getValue();
-
-            storageBanknotes.put(banknote, storageBanknotes.get(banknote) + number);
+            int currentCash = storageBanknotes.get(banknote) == null ? 0 : storageBanknotes.get(banknote);
+            storageBanknotes.put(banknote, currentCash + number);
         }
     }
 

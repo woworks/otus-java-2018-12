@@ -12,6 +12,8 @@ public interface AtmProcessor {
 
     void depositCash(Map<Banknote, Integer> banknotesToDeposit);
 
+    void depositCash(AtmMemento atmMemento);
+
     void checkBalance();
 
     Map<Banknote, Integer> getBalance();
