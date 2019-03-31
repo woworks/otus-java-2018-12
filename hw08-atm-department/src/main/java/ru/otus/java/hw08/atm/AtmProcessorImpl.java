@@ -43,6 +43,11 @@ public class AtmProcessorImpl implements AtmProcessor {
     }
 
     @Override
+    public void depositCash(AtmMemento atmMemento) {
+        depositCash(atmMemento.getState());
+    }
+
+    @Override
     public void checkBalance() {
         System.out.println("ATM #" + this.id + " balance: ");
         for (int i = 0; i < Banknote.values().length; i++) {

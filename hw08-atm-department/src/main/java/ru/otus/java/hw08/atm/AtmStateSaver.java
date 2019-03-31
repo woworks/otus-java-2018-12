@@ -2,13 +2,13 @@ package ru.otus.java.hw08.atm;
 
 public class AtmStateSaver {
 
-    private AtmMemento memento;
+    private AtmStates memento;
 
-    public AtmMemento getMemento() {
+    public AtmStates getMemento() {
         return memento;
     }
 
-    public void setMemento(AtmMemento memento) {
+    public void setStates(AtmStates memento) {
         this.memento = memento;
     }
 }
