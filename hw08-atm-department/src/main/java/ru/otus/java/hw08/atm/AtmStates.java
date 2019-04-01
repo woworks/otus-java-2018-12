@@ -3,13 +3,17 @@ package ru.otus.java.hw08.atm;
 import java.util.Map;
 
 public class AtmStates {
-    Map<Long, AtmMemento> states;
+    private Map<Long, Memento> states;
 
-    public AtmStates(Map<Long, AtmMemento> states) {
+    AtmStates(Map<Long, Memento> states) {
         this.states = states;
     }
 
-    public AtmMemento getStateByAtmId(Long atmId) {
+    Memento getStateByAtmId(Long atmId) {
         return states.get(atmId);
+    }
+
+    void setStateByAtmId(Long atmId, Memento memento) {
+        states.put(atmId, memento);
     }
 }
