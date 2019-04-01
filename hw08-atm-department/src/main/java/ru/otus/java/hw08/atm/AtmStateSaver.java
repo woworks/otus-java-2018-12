@@ -1,10 +1,12 @@
 package ru.otus.java.hw08.atm;
 
+import java.util.HashMap;
+
 public class AtmStateSaver {
 
-    private AtmStates memento;
+    private AtmStates memento = new AtmStates(new HashMap<>());
 
-    public AtmStates getMemento() {
+    AtmStates getMemento() {
         return memento;
     }
 

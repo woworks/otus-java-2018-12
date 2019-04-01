@@ -12,10 +12,14 @@ public interface AtmProcessor {
 
     void depositCash(Map<Banknote, Integer> banknotesToDeposit);
 
-    void depositCash(AtmMemento atmMemento);
-
     void checkBalance();
 
     Map<Banknote, Integer> getBalance();
+
+    void depositCash(AtmMemento atmMemento);
+
+    Memento saveToMemento();
+
+    void loadFromMemento(Memento memento);
 
 }

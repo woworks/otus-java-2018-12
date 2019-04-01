@@ -6,7 +6,7 @@ import java.util.Map;
 public class AtmProcessorImpl implements AtmProcessor {
 
     private Long id;
-    private final AtmStorage atmStorage;
+    private AtmStorage atmStorage;
 
     public AtmProcessorImpl(Long id, AtmStorage atmStorage) {
         this.id = id;
@@ -43,11 +43,6 @@ public class AtmProcessorImpl implements AtmProcessor {
     }
 
     @Override
-    public void depositCash(AtmMemento atmMemento) {
-        depositCash(atmMemento.getState());
-    }
-
-    @Override
     public void checkBalance() {
         System.out.println("ATM #" + this.id + " balance: ");
         for (int i = 0; i < Banknote.values().length; i++) {
@@ -79,5 +74,26 @@ public class AtmProcessorImpl implements AtmProcessor {
 
     public AtmStorage getAtmStorage() {
         return atmStorage;
+    }
+
+    @Override
+    public void depositCash(AtmMemento atmMemento) {
+        depositCash(atmMemento.getState());
+    }
+
+    @Override
+    public Memento saveToMemento() {
+        Map<Banknote, Integer> storageCopy = new HashMap<>();
+        for(Map.Entry<Banknote, Integer> banknoteEntry: atmStorage.getStorageBanknotes().entrySet()){
+            storageCopy.put(banknoteEntry.getKey(), banknoteEntry.getValue());
+        }
+        return new AtmMemento(storageCopy);
+    }
+
+    @Override
+    public void loadFromMemento(Memento memento) {
+        this.atmStorage.getStorageBanknotes().clear();
+        Map<Banknote, Integer> state = memento.getState();
+        this.atmStorage.depositCash(state);
     }
 }
