@@ -7,6 +7,8 @@ public class Address {
     private int buildingNo;
     private int apartmentNo;
 
+    public Address() {}
+
     public Address(String country, String city, String street, int buildingNo, int apartmentNo) {
         this.country = country;
         this.city = city;
@@ -53,5 +55,41 @@ public class Address {
 
     public void setApartmentNo(int apartmentNo) {
         this.apartmentNo = apartmentNo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+
+        if (buildingNo != address.buildingNo) return false;
+        if (apartmentNo != address.apartmentNo) return false;
+        if (!country.equals(address.country)) return false;
+        if (!city.equals(address.city)) return false;
+        return street.equals(address.street);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = country.hashCode();
+        result = 31 * result + city.hashCode();
+        result = 31 * result + street.hashCode();
+        result = 31 * result + buildingNo;
+        result = 31 * result + apartmentNo;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", buildingNo=" + buildingNo +
+                ", apartmentNo=" + apartmentNo +
+                '}';
     }
 }

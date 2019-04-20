@@ -1,5 +1,6 @@
 package ru.otus.java.hw09.serializer;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,21 +17,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JsonSerializerImplTest {
 
-    public static final String FIRST_NAME = "John";
-    public static final String LAST_NAME = "Doe";
-    public static final long ID = 101L;
-    public static final String COUNTRY_RUSSIA = "Russia";
-    public static final String CITY_MOSCOW = "Moscow";
-    public static final String PUSHKIN_STR = "Pushkin Str";
-    public static final String CITY_ASTRAKHAN = "Astrakhan";
-    public static final String LOMONOSOV_STR = "Lomonosov Str";
-    public static final BigDecimal SALARY = new BigDecimal("1608.50");
+    private static final String FIRST_NAME = "John";
+    private static final String LAST_NAME = "Doe";
+    private static final long ID = 101L;
+    private static final String COUNTRY_RUSSIA = "Russia";
+    private static final String CITY_MOSCOW = "Moscow";
+    private static final String PUSHKIN_STR = "Pushkin Str";
+    private static final String CITY_ASTRAKHAN = "Astrakhan";
+    private static final String LOMONOSOV_STR = "Lomonosov Str";
+    private static final BigDecimal SALARY = new BigDecimal("1608.50");
 
     private static Employee testEmployee;
     private static JSONObject testEmployeeJson;
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         testEmployee = getTestEmployee();
         testEmployeeJson = getEmployeeJson(testEmployee);
     }
@@ -38,9 +39,8 @@ class JsonSerializerImplTest {
     @Test
     void getObject() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         JsonSerializer serializer = new JsonSerializerImpl();
-        Employee employee = (Employee)serializer.getObject(testEmployeeJson, Employee.class);
-
-        assertEquals(testEmployee, employee);
+        Employee employee = (Employee) serializer.getObject(testEmployeeJson, Employee.class);
+        assertTrue(EqualsBuilder.reflectionEquals(testEmployee, employee));
     }
 
     @Test
@@ -56,10 +56,10 @@ class JsonSerializerImplTest {
         employee.setId(ID);
         employee.setFirstName(FIRST_NAME);
         employee.setLastName(LAST_NAME);
-        employee.setExternalIds(new long[] {1000L,2000L,3000L});
+        employee.setExternalIds(new long[]{1000L, 2000L, 3000L});
         Address address1 = new Address(COUNTRY_RUSSIA, CITY_MOSCOW, PUSHKIN_STR, 120, 13);
         Address address2 = new Address(COUNTRY_RUSSIA, CITY_ASTRAKHAN, LOMONOSOV_STR, 15, 121);
-        employee.setAddresses(new Address[] {address1, address2});
+        employee.setAddresses(new Address[]{address1, address2});
 
         employee.setSalary(SALARY);
         Project project1 = new Project("Task Manager", 600_000L);
@@ -76,14 +76,14 @@ class JsonSerializerImplTest {
         jsonEmployee.put("lastName", employee.getLastName());
 
         JSONArray externalIds = new JSONArray();
-        for(Long id: employee.getExternalIds()){
+        for (Long id : employee.getExternalIds()) {
             externalIds.add(id);
         }
 
         jsonEmployee.put("externalIds", externalIds);
 
         JSONArray addressesArray = new JSONArray();
-        for (Address address: employee.getAddresses()){
+        for (Address address : employee.getAddresses()) {
             JSONObject addressJson = new JSONObject();
             addressJson.put("country", address.getCountry());
             addressJson.put("city", address.getCity());
@@ -93,13 +93,13 @@ class JsonSerializerImplTest {
 
             addressesArray.add(addressJson);
         }
-;
+
 
         jsonEmployee.put("addresses", addressesArray);
         jsonEmployee.put("salary", SALARY);
 
         JSONArray projectArray = new JSONArray();
-        for (Project project: employee.getProjects()){
+        for (Project project : employee.getProjects()) {
             JSONObject projectJson = new JSONObject();
             projectJson.put("name", project.getName());
             projectJson.put("budget", project.getBudget());
@@ -110,4 +110,5 @@ class JsonSerializerImplTest {
 
         return jsonEmployee;
     }
+
 }
