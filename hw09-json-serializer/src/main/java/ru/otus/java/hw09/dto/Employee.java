@@ -13,6 +13,7 @@ public class Employee {
     private Address[] addresses;
     private List<Project> projects;
     private long[] externalIds;
+    private String nullString = null;
 
     public String getFirstName() {
         return firstName;
@@ -111,5 +112,13 @@ public class Employee {
                 ", projects=" + projects +
                 ", externalIds=" + Arrays.toString(externalIds) +
                 '}';
+    }
+
+    public String getNullString() {
+        return nullString;
+    }
+
+    public void setNullString(String nullString) {
+        this.nullString = nullString;
     }
 }

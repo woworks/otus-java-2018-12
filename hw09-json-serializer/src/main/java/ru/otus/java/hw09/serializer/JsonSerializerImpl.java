@@ -8,6 +8,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class JsonSerializerImpl implements JsonSerializer {
+
     @Override
     public Object getObject(JSONObject json, Class clazz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Map<String, Object> map = new HashMap<>();
@@ -101,7 +102,30 @@ public class JsonSerializerImpl implements JsonSerializer {
     }
 
     @Override
-    public JSONObject serialize(Object object) {
+    public String serialize(Object object) throws JsonSerializerException {
+
+        if (object == null) {
+            return null;
+        }
+
+        if (isSimple(object)) {
+            throw new JsonSerializerException("Cannot serialize object with no key");
+        }
+
+        if (object instanceof List) {
+            return serializeList(object).toString();
+        } else if (object.getClass().isArray()) {
+            return serializeArray(object).toString();
+        }
+
+        return serializeObject(object).toString();
+    }
+
+    public JSONObject serializeObject(Object object) {
+
+        if (object == null) {
+            return null;
+        }
         JSONObject output = new JSONObject();
 
         Reflector reflector = new Reflector();
@@ -113,11 +137,12 @@ public class JsonSerializerImpl implements JsonSerializer {
 
             if (value instanceof List) {
                 value = serializeList(value);
-            } else if (value.getClass().isArray()) {
+            } else if (value != null && value.getClass().isArray()) {
                 value = serializeArray(value);
             }
 
             output.put(key, value);
+
         }
 
         return output;
@@ -130,7 +155,7 @@ public class JsonSerializerImpl implements JsonSerializer {
             if (isPrimitive) {
                 jsonArray.add(Array.get(objects, i));
             } else {
-                jsonArray.add(serialize(Array.get(objects, i)));
+                jsonArray.add(serializeObject(Array.get(objects, i)));
             }
         }
         return jsonArray;
@@ -138,10 +163,35 @@ public class JsonSerializerImpl implements JsonSerializer {
 
     private JSONArray serializeList(Object objects) {
         JSONArray jsonArray = new JSONArray();
-        for (Object object : (List) objects) {
-            jsonArray.add(serialize(object));
+        if (((List) objects).size() > 0) {
+
+
+            for (Object object : (List) objects) {
+                if (isSimple(object)) {
+                    jsonArray.add(object);
+                } else {
+                    jsonArray.add(serializeObject(object));
+                }
+            }
         }
+
         return jsonArray;
+    }
+
+    private boolean isSimple(Object object) {
+        if (
+                object.getClass().equals(Integer.class) ||
+                        object.getClass().equals(Long.class) ||
+                        object.getClass().equals(Double.class) ||
+                        object.getClass().equals(Float.class) ||
+                        object.getClass().equals(Byte.class) ||
+                        object.getClass().equals(Boolean.class) ||
+                        object.getClass().equals(String.class)
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private Class getClass(String className) throws ClassNotFoundException {

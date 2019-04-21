@@ -3,6 +3,7 @@ package ru.otus.java.hw09.serializer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.otus.java.hw09.dto.Address;
@@ -12,6 +13,7 @@ import ru.otus.java.hw09.dto.Project;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,12 +46,43 @@ class JsonSerializerImplTest {
     }
 
     @Test
-    void serialize() {
+    void serialize() throws JsonSerializerException {
         JsonSerializer serializer = new JsonSerializerImpl();
-        JSONObject serializedEmployee = serializer.serialize(testEmployee);
+        String serializedEmployee = serializer.serialize(testEmployee);
 
-        assertEquals(testEmployeeJson, serializedEmployee);
+        assertEquals(testEmployeeJson.toString(), serializedEmployee);
     }
+
+    @Test
+    void serialize2() throws JsonSerializerException {
+        JsonSerializer serializer = new JsonSerializerImpl();
+        String serialized;
+
+        serialized = serializer.serialize(null);
+        System.out.println("null = " + serialized);
+        assertNull(serialized);
+
+        serialized = serializer.serialize(new int[] {1, 2, 3});
+
+        JSONArray intArray = new JSONArray();
+        intArray.addAll(Arrays.asList(1, 2, 3));
+        System.out.println("{1, 2, 3} = " + serialized);
+        assertEquals(intArray.toString(), serialized);
+
+        serialized = serializer.serialize(List.of(1, 2, 3));
+        assertEquals(intArray.toString(), serialized);
+        System.out.println(serialized);
+    }
+
+    @Test
+    void serializeNoKey() throws JsonSerializerException {
+        JsonSerializer serializer = new JsonSerializerImpl();
+        Assertions.assertThrows(JsonSerializerException.class, () -> {
+            serializer.serialize(1);
+        });
+
+    }
+
 
     private static Employee getTestEmployee() {
         Employee employee = new Employee();
@@ -107,6 +140,9 @@ class JsonSerializerImplTest {
         }
 
         jsonEmployee.put("projects", projectArray);
+        jsonEmployee.put("nullString", null);
+
+
 
         return jsonEmployee;
     }
