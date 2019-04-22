@@ -108,11 +108,9 @@ public class JsonSerializerImpl implements JsonSerializer {
             return null;
         }
 
-        if (isSimple(object)) {
-            throw new JsonSerializerException("Cannot serialize object with no key");
-        }
-
-        if (object instanceof List) {
+        if (isSimple(object)){
+            return object.toString();
+        } else if (object instanceof List) {
             return serializeList(object).toString();
         } else if (object.getClass().isArray()) {
             return serializeArray(object).toString();
@@ -186,7 +184,9 @@ public class JsonSerializerImpl implements JsonSerializer {
                         object.getClass().equals(Float.class) ||
                         object.getClass().equals(Byte.class) ||
                         object.getClass().equals(Boolean.class) ||
-                        object.getClass().equals(String.class)
+                        object.getClass().equals(String.class) ||
+                        object.getClass().equals(Character.class) ||
+                        object.getClass().equals(Short.class)
         ) {
             return true;
         } else {
@@ -201,6 +201,7 @@ public class JsonSerializerImpl implements JsonSerializer {
         if ("float".equals(className)) return float.class;
         if ("byte".equals(className)) return byte.class;
         if ("char".equals(className)) return char.class;
+        if ("short".equals(className)) return short.class;
         if ("boolean".equals(className)) return boolean.class;
         return Class.forName(className);
     }

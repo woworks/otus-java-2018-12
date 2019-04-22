@@ -72,17 +72,10 @@ class JsonSerializerImplTest {
         serialized = serializer.serialize(List.of(1, 2, 3));
         assertEquals(intArray.toString(), serialized);
         System.out.println(serialized);
+
+        serialized = serializer.serialize(1);
+        assertEquals("1", serialized);
     }
-
-    @Test
-    void serializeNoKey() throws JsonSerializerException {
-        JsonSerializer serializer = new JsonSerializerImpl();
-        Assertions.assertThrows(JsonSerializerException.class, () -> {
-            serializer.serialize(1);
-        });
-
-    }
-
 
     private static Employee getTestEmployee() {
         Employee employee = new Employee();
