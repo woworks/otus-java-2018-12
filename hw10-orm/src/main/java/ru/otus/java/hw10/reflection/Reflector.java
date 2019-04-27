@@ -5,8 +5,9 @@ import java.util.*;
 
 public class Reflector {
 
+    private Reflector() {}
 
-    public Map<String, Object> getFields(Object object) {
+    public static Map<String, Object> getFields(Object object) {
         Class objectClass = object.getClass();
         Field[] fields = objectClass.getDeclaredFields();
         Map<String, Object> map = new HashMap<>(fields.length);
@@ -25,7 +26,7 @@ public class Reflector {
         return map;
     }
 
-    public void populateFields(Object object, Map<String, Object> valuesMap) {
+    public static void populateFields(Object object, Map<String, Object> valuesMap) {
 
         Class objectClass = object.getClass();
         Field[] fields = objectClass.getDeclaredFields();
