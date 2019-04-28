@@ -7,7 +7,19 @@ public class Reflector {
 
     private Reflector() {}
 
+    private static Map<Class, Map<String, Object>> classCache = new HashMap<>();
+
     public static Map<String, Object> getFields(Object object) {
+        if (classCache.containsKey(object.getClass())) {
+            return classCache.get(object.getClass());
+        } else {
+            Map<String, Object> fields = getObjectFields(object);
+            classCache.put(object.getClass(), fields);
+            return fields;
+        }
+    }
+
+    private static Map<String, Object> getObjectFields(Object object) {
         Class objectClass = object.getClass();
         Field[] fields = objectClass.getDeclaredFields();
         Map<String, Object> map = new HashMap<>(fields.length);
