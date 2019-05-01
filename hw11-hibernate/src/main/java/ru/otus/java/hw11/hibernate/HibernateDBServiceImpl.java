@@ -15,6 +15,7 @@ import ru.otus.java.hw11.datasets.UserDataSet;
 import ru.otus.java.hw11.hibernate.dao.UserDataSetDAO;
 
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -64,14 +65,10 @@ public class HibernateDBServiceImpl implements DBService {
 
     @Override
     public void save(UserDataSet dataSet) {
-        try (Session session = sessionFactory.openSession()) {
+        runInSession(session -> {
             UserDataSetDAO dao = new UserDataSetDAO(session);
             dao.save(dataSet);
-            //session.save(dataSet);
-
-            session.save(new EmptyDataSet());
-
-        }
+        });
     }
 
     public UserDataSet read(long id) {
@@ -93,6 +90,14 @@ public class HibernateDBServiceImpl implements DBService {
             R result = function.apply(session);
             transaction.commit();
             return result;
+        }
+    }
+
+    void runInSession(Consumer<Session> function) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            function.accept(session);
+            transaction.commit();
         }
     }
 }
