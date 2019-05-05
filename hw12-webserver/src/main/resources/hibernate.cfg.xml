@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/hw12-webserver</property>
+        <property name="hibernate.connection.username">hw12webserver</property>
+        <property name="hibernate.connection.password">hw12webserver</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">create</property>
+        <property name="hibernate.connection.useSSL">false</property>
+        <property name="hibernate.enable_lazy_load_no_trans">true</property>
+
+    </session-factory>
+</hibernate-configuration>
