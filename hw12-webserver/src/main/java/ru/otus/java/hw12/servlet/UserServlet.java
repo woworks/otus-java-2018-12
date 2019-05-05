@@ -7,7 +7,6 @@ import ru.otus.java.hw12.datasets.UserDataSet;
 import ru.otus.java.hw12.freemarker.TemplateProcessor;
 
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,23 +19,32 @@ import java.util.Map;
 
 public class UserServlet extends HttpServlet {
 
-    public static final String USER_INFO_ERROR = "/users?error=Incorrect%20User%20Info";
+    private static final String USER_INFO_ERROR = "/users?error=Incorrect%20User%20Info";
     private static final String TEXT_HTML = "text/html;charset=utf-8";
     private static final String USERS_PAGE_TEMPLATE = "users.html";
     private final DBService dbService;
     private final TemplateProcessor templateProcessor;
 
-    public UserServlet(DBService dbService) throws IOException {
+    public UserServlet(DBService dbService, TemplateProcessor templateProcessor) {
         this.dbService = dbService;
-        this.templateProcessor = new TemplateProcessor();
+        this.templateProcessor = templateProcessor;
     }
 
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String id = req.getParameter("id");
-        String errorMessage = req.getParameter("error");
 
+        Map<String, Object> pageVariables = getUserDataSetMap(id);
+
+        checkForError(req, pageVariables);
+
+        resp.setContentType(TEXT_HTML);
+        resp.getWriter().println(templateProcessor.getPage(USERS_PAGE_TEMPLATE, pageVariables));
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private Map<String, Object> getUserDataSetMap(String id) {
         Map<String, Object> pageVariables = new HashMap<>();
 
         List<UserDataSet> users = new ArrayList<>();
@@ -56,41 +64,44 @@ public class UserServlet extends HttpServlet {
         id = id == null? "" : id;
         pageVariables.put("id", id);
         pageVariables.put("users", users);
+        return pageVariables;
+    }
+
+    private void checkForError(HttpServletRequest req, Map<String, Object> pageVariables) {
+        String errorMessage = req.getParameter("error");
         if (errorMessage != null && errorMessage.trim().length() > 0){
             pageVariables.put("errorMessage", errorMessage);
         }
-
-        resp.setContentType(TEXT_HTML);
-        resp.getWriter().println(templateProcessor.getPage(USERS_PAGE_TEMPLATE, pageVariables));
-        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            saveUserDataSet(req);
+        } catch (ServletDataException e) {
+            resp.sendRedirect(req.getContextPath() + USER_INFO_ERROR);
+            return;
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/users");
+
+    }
+
+    private void saveUserDataSet(HttpServletRequest req) throws ServletDataException {
         String name = req.getParameter("name");
-        String age = req.getParameter("age");
         String phone1 = req.getParameter("phone1");
         String phone2 = req.getParameter("phone1");
         String address = req.getParameter("address");
 
-        int ageNum;
+        Integer age = ServletHelper.getIntFromRequest("age", req);
 
-        if ((name == null || name.trim().length() == 0 ||
-                age == null || name.trim().length() == 0)) {
-            resp.sendRedirect(req.getContextPath() + USER_INFO_ERROR);
-            return;
+        if ((name == null || name.trim().length() == 0)) {
+            throw new ServletDataException("Bad data: name");
         }
-        try {
-            ageNum = Integer.valueOf(age);
-        }  catch (NumberFormatException e) {
-            resp.sendRedirect(req.getContextPath() + USER_INFO_ERROR);
-            return;
-        }
-
 
         UserDataSet userDataSet = new UserDataSet();
         userDataSet.setName(name);
-        userDataSet.setAge(ageNum);
+        userDataSet.setAge(age);
         if (address != null && address.trim().length() > 0) {
             userDataSet.setAddress(new AddressDataSet(address));
         }
@@ -105,10 +116,6 @@ public class UserServlet extends HttpServlet {
         userDataSet.setPhones(phones);
 
         dbService.save(userDataSet);
-
-
-        resp.sendRedirect(req.getContextPath() + "/users");
-
     }
 
 }
