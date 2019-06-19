@@ -10,7 +10,6 @@ import ru.otus.java.hw14.di.BasicModule;
 import ru.otus.java.hw14.messagesystem.Address;
 import ru.otus.java.hw14.messagesystem.MessageSystem;
 import ru.otus.java.hw14.messaging.*;
-import ru.otus.java.hw14.messaging.messages.MsgGlobalSearch;
 
 import java.io.IOException;
 
@@ -27,6 +26,8 @@ public class MessageSocket {
     private Address frontAddress = new Address("Frontend");
     private Address searchAddress = new Address("Search");
     private MessageSystemContext context = new MessageSystemContext(messageSystem);
+    private FrontendService frontendService;
+    private SearchService searchService;
 
     public MessageSocket() {
 
@@ -36,10 +37,10 @@ public class MessageSocket {
         context.setFrontAddress(frontAddress);
         context.setSearchAddress(searchAddress);
 
-        FrontendService frontendService = new FrontendServiceImpl(context, frontAddress);
+        frontendService = new FrontendServiceImpl(context, frontAddress);
         frontendService.init();
 
-        SearchService searchService = new SearchServiceImpl(context, searchAddress, dbService);
+        searchService = new SearchServiceImpl(context, searchAddress, dbService);
         searchService.init();
 
         messageSystem.start();
@@ -63,7 +64,7 @@ public class MessageSocket {
     public void onText(String searchMessage) {
         System.out.println("received message from UI: " + searchMessage);
         try {
-            messageSystem.sendMessage(new MsgGlobalSearch(frontAddress, searchAddress, session, searchMessage));
+            frontendService.submitToSearch(searchMessage, session);
         } catch (Exception e) {
             e.printStackTrace();
         }

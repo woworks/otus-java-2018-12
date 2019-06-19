@@ -13,31 +13,29 @@ import ru.otus.java.hw14.hibernate.HibernateDBServiceImpl;
 import ru.otus.java.hw14.servlet.UserServlet;
 
 class WebServerWrapper {
-    private static final int PORT = 8080;
-    private static final DBService dbService;
-    private static final TemplateProcessor templateProcessor;
+    private final int PORT = 8080;
+    private final DBService dbService;
+    private final TemplateProcessor templateProcessor;
+    private Server server = new Server(PORT);
 
 
-    static {
-
+    WebServerWrapper() {
         dbService = new HibernateDBServiceImpl();
         templateProcessor = new TemplateProcessor();
         new DBInitializerService(dbService).init();
 
-    }
-    void start() throws Exception {
-
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-
         context.addServlet(new ServletHolder(new UserServlet(dbService, templateProcessor)), "/users");
-        Server server = new Server(PORT);
-
 
         HandlerList handlers = new HandlerList();
         // first element  is webSocket handler, second element is first handler
         handlers.setHandlers(new Handler[] {new SocketHandler(), context});
         server.setHandler(handlers);
 
+
+
+    }
+    void start() throws Exception {
         server.start();
         server.join();
     }
