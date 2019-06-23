@@ -1,57 +1,27 @@
 package ru.otus.java.hw14.socket;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import ru.otus.java.hw14.base.DBService;
-import ru.otus.java.hw14.di.BasicModule;
-import ru.otus.java.hw14.messagesystem.Address;
-import ru.otus.java.hw14.messagesystem.MessageSystem;
-import ru.otus.java.hw14.messaging.*;
+import ru.otus.java.hw14.MessageSystemRunner;
 
 import java.io.IOException;
 
 @WebSocket
 public class MessageSocket {
 
-    @Inject
-    private DBService dbService;
     private Session session;
+    private MessageSystemRunner messageSystem;
 
-
-    private static MessageSystem messageSystem = new MessageSystem();
-
-    private Address frontAddress = new Address("Frontend");
-    private Address searchAddress = new Address("Search");
-    private MessageSystemContext context = new MessageSystemContext(messageSystem);
-    private FrontendService frontendService;
-    private SearchService searchService;
-
-    public MessageSocket() {
-
-        Injector injector = Guice.createInjector(new BasicModule());
-        injector.injectMembers(this);
-
-        context.setFrontAddress(frontAddress);
-        context.setSearchAddress(searchAddress);
-
-        frontendService = new FrontendServiceImpl(context, frontAddress);
-        frontendService.init();
-
-        searchService = new SearchServiceImpl(context, searchAddress, dbService);
-        searchService.init();
-
-        messageSystem.start();
+    public MessageSocket(MessageSystemRunner messageSystem) {
+        this.messageSystem = messageSystem;
     }
+
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
         System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         System.out.println("Connect session: " + session.hashCode());
         System.out.println("Connect: instance = " + this.hashCode());
-        System.out.println("Connect: message instance = " + messageSystem.hashCode());
         try {
             this.session = session;
             this.session.getRemote().sendString(buildMessages());
@@ -64,7 +34,7 @@ public class MessageSocket {
     public void onText(String searchMessage) {
         System.out.println("received message from UI: " + searchMessage);
         try {
-            frontendService.submitToSearch(searchMessage, session);
+            messageSystem.getFrontendService().submitToSearch(searchMessage, session);
         } catch (Exception e) {
             e.printStackTrace();
         }

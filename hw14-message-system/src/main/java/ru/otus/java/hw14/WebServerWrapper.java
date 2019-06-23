@@ -17,10 +17,13 @@ class WebServerWrapper {
     private final DBService dbService;
     private final TemplateProcessor templateProcessor;
     private Server server = new Server(PORT);
+    private MessageSystemRunner messageSystem;
 
 
     WebServerWrapper() {
+
         dbService = new HibernateDBServiceImpl();
+        messageSystem = new MessageSystemRunner(dbService);
         templateProcessor = new TemplateProcessor();
         new DBInitializerService(dbService).init();
 
@@ -29,13 +32,14 @@ class WebServerWrapper {
 
         HandlerList handlers = new HandlerList();
         // first element  is webSocket handler, second element is first handler
-        handlers.setHandlers(new Handler[] {new SocketHandler(), context});
+        handlers.setHandlers(new Handler[] {new SocketHandler(messageSystem), context});
         server.setHandler(handlers);
-
-
-
     }
+
+
+
     void start() throws Exception {
+        messageSystem.start();
         server.start();
         server.join();
     }
