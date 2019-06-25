@@ -7,14 +7,17 @@ import ru.otus.java.hw14.messaging.MsgToFrontend;
 
 public class MsgGlobalSearchAnswer extends MsgToFrontend {
     private final String replyMessage;
+    private final String sessionId;
 
-    public MsgGlobalSearchAnswer(Address from, Address to, String replyMessage) {
+
+    public MsgGlobalSearchAnswer(Address from, Address to, String replyMessage, String sessionId) {
         super(from, to);
         this.replyMessage = replyMessage;
+        this.sessionId = sessionId;
     }
 
     @Override
     public void exec(FrontendService frontendService) {
-        frontendService.pushToWeb(replyMessage);
+        frontendService.pushToWeb(replyMessage, sessionId);
     }
 }

@@ -9,10 +9,12 @@ import java.util.List;
 
 public class MsgGlobalSearch extends MsgToSearch {
     private final String searchMessage;
+    private final String sessionId;
 
-    public MsgGlobalSearch(Address from, Address to, String searchMessage) {
+    public MsgGlobalSearch(Address from, Address to, String searchMessage, String sessionId) {
         super(from, to);
         this.searchMessage = searchMessage;
+        this.sessionId = sessionId;
     }
 
     @Override
@@ -34,6 +36,6 @@ public class MsgGlobalSearch extends MsgToSearch {
 
         String replyMessage = builder.toString();
 
-        searchService.getMS().sendMessage(new MsgGlobalSearchAnswer(getTo(), getFrom(), replyMessage));
+        searchService.getMS().sendMessage(new MsgGlobalSearchAnswer(getTo(), getFrom(), replyMessage, sessionId));
     }
 }

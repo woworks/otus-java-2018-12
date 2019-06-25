@@ -2,7 +2,7 @@ package ru.otus.java.hw14.socket;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import ru.otus.java.hw14.MessageSystemRunner;
+import ru.otus.java.hw14.messaging.FrontendService;
 
 import java.io.IOException;
 
@@ -10,10 +10,10 @@ import java.io.IOException;
 public class MessageSocket {
 
     private Session session;
-    private MessageSystemRunner messageSystem;
+    private FrontendService frontendService;
 
-    public MessageSocket(MessageSystemRunner messageSystem) {
-        this.messageSystem = messageSystem;
+    public MessageSocket(FrontendService frontendService) {
+        this.frontendService = frontendService;
     }
 
 
@@ -34,7 +34,7 @@ public class MessageSocket {
     public void onText(String searchMessage) {
         System.out.println("received message from UI: " + searchMessage);
         try {
-            messageSystem.getFrontendService().submitToSearch(searchMessage, session);
+            frontendService.submitToSearch(searchMessage, session);
         } catch (Exception e) {
             e.printStackTrace();
         }

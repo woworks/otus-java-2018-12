@@ -6,11 +6,13 @@ import ru.otus.java.hw14.messagesystem.MessageSystem;
 import ru.otus.java.hw14.messaging.messages.MsgGlobalSearch;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FrontendServiceImpl implements FrontendService {
     private final Address address;
     private final MessageSystemContext context;
-    private Session session;
+    private Map<String, Session> sessions = new HashMap<>();
 
     public FrontendServiceImpl(MessageSystemContext context, Address address) {
         this.context = context;
@@ -23,19 +25,20 @@ public class FrontendServiceImpl implements FrontendService {
 
     @Override
     public void submitToSearch(String searchMessage, Session session) {
-        this.session = session;
+        String sessionId = String.valueOf(session.hashCode());
+        this.sessions.put(sessionId, session);
         context.getMessageSystem()
                 .sendMessage(new MsgGlobalSearch(
                         context.getFrontAddress(),
                         context.getSearchAddress(),
-                        searchMessage)
+                        searchMessage, sessionId)
                 );
     }
 
     @Override
-    public void pushToWeb(String replyMessage) {
+    public void pushToWeb(String replyMessage, String sessionId) {
         try {
-            this.session.getRemote().sendString(replyMessage);
+            this.sessions.get(sessionId).getRemote().sendString(replyMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }

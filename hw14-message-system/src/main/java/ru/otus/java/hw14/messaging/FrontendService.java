@@ -10,6 +10,6 @@ public interface FrontendService extends Addressee {
 
     void submitToSearch(String searchMessage, Session session);
 
-    void pushToWeb(String replyMessage);
+    void pushToWeb(String replyMessage, String sessionId);
 }
 
