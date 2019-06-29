@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+
+    <context:component-scan base-package="ru.otus.java.hw15.hibernate"></context:component-scan>
+    <context:annotation-config/>
+    <context:spring-configured/>
+
+    <bean id="DBService" class="ru.otus.java.hw15.hibernate.HibernateDBServiceImpl">
+    </bean>
+
+    <bean id="TemplateProcessor" class="ru.otus.java.hw15.freemarker.TemplateProcessor">
+    </bean>
+
+    <bean id="WebServerWrapper" class="ru.otus.java.hw15.WebServerWrapper">
+        <constructor-arg ref="DBService"/>
+    </bean>
+
+    <websocket:handlers allowed-origins="*">
+        <websocket:mapping path="/usersws" handler="socketHandler"/>
+    </websocket:handlers>
+
+    <bean id="socketHandler" class="ru.otus.java.hw15.socket.MessageSocketHandler">
+        <constructor-arg ref="WebServerWrapper"/>
+    </bean>
+
+</beans>
