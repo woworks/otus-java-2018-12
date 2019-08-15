@@ -1,10 +1,11 @@
 package ru.otus.java.hw16.server.messages;
 
 
-import ru.otus.java.hw16.server.base.FrontendService;
 import ru.otus.java.hw16.server.messagesystem.Address;
 import ru.otus.java.hw16.server.messagesystem.Addressee;
-import ru.otus.java.hw16.server.messagesystem.Message;
+import ru.otus.java.hw16.server.service.FrontendService;
+import ru.otus.java.hw16.server.workers.MessageWorker;
+import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
 /**
  * Created by tully.
@@ -15,13 +16,14 @@ public abstract class MsgToFrontend extends Message {
     }
 
     @Override
-    public void exec(Addressee addressee) {
+    public void exec(Addressee addressee, MessageWorker worker) {
         if (addressee instanceof FrontendService) {
-            exec((FrontendService) addressee);
+            exec((FrontendService) addressee, (SocketMessageWorker) worker);
         } else {
             //todo error!
         }
+
     }
 
-    public abstract void exec(FrontendService frontendService);
+    public abstract void exec(FrontendService frontendService, SocketMessageWorker worker);
 }

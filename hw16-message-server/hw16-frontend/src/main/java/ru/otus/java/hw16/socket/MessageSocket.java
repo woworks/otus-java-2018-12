@@ -2,7 +2,7 @@ package ru.otus.java.hw16.socket;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import ru.otus.java.hw16.service.FrontendService;
+import ru.otus.java.hw16.server.service.FrontendService;
 
 import java.io.IOException;
 

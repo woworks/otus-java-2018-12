@@ -1,11 +1,23 @@
 package ru.otus.java.hw16.server.messages;
 
+import ru.otus.java.hw16.server.base.ServerService;
+import ru.otus.java.hw16.server.messagesystem.Address;
+import ru.otus.java.hw16.server.workers.SocketMessageWorker;
+
+
 public class PingMessage extends MsgToServer {
     private final long time;
+    private final Address backAddress;
 
-    public PingMessage() {
-        super(from, to);
+    public PingMessage(Address from) {
+        super(from, from);
+        backAddress = from;
         time = System.currentTimeMillis();
+    }
+
+    @Override
+    public void exec(ServerService serverService, SocketMessageWorker worker) {
+        serverService.ping(backAddress);
     }
 
     public long getTime() {
@@ -14,9 +26,9 @@ public class PingMessage extends MsgToServer {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("PingMessage{");
-        sb.append("time=").append(time);
-        sb.append('}');
-        return sb.toString();
+        return "PingMessage{" +
+                "time=" + time +
+                ", backAddress=" + backAddress +
+                '}';
     }
 }

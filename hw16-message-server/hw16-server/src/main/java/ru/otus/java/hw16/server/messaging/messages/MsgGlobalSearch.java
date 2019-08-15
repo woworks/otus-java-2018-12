@@ -1,9 +1,10 @@
 package ru.otus.java.hw16.server.messaging.messages;
 
 import ru.otus.java.hw16.server.datasets.UserDataSet;
-import ru.otus.java.hw16.server.messagesystem.Address;
 import ru.otus.java.hw16.server.messages.MsgToSearch;
 import ru.otus.java.hw16.server.messages.SearchService;
+import ru.otus.java.hw16.server.messagesystem.Address;
+import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
 import java.util.List;
 
@@ -18,24 +19,34 @@ public class MsgGlobalSearch extends MsgToSearch {
     }
 
     @Override
-    public void exec(SearchService searchService) {
+    public void exec(SearchService searchService, SocketMessageWorker worker) {
         System.out.println("Searching for..." + searchMessage);
 
 
         List<UserDataSet> userDataSets = searchService.getDBService().findByName(searchMessage);
-        try {
-            Thread.sleep(1_000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        System.out.println("Found reply for " + searchMessage  + " = " + userDataSets);
+        if (userDataSets.size() > 0) {
+            System.out.println("INFO:: Found reply for " + searchMessage + " = " + userDataSets);
+        } else {
+            System.out.println("WARN:: Nothing found for " + searchMessage);
+        }
 
         StringBuilder builder = new StringBuilder();
         userDataSets.forEach(user ->  builder.append(user.getId() + ":" + user.getName() + ";"));
 
         String replyMessage = builder.toString();
 
-        searchService.getMS().sendMessage(new MsgGlobalSearchAnswer(getTo(), getFrom(), replyMessage, sessionId));
+        worker.send(new MsgGlobalSearchAnswer(getTo(), getFrom(), replyMessage, sessionId));
     }
+
+    @Override
+    public String toString() {
+        return "MsgGlobalSearch{" +
+                "from='" + getFrom() + '\'' +
+                "to='" + getTo() + '\'' +
+                "searchMessage='" + searchMessage + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                '}';
+    }
+
 }

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import ru.otus.java.hw16.server.annotation.Blocks;
 import ru.otus.java.hw16.server.messages.Message;
-import ru.otus.java.hw16.server.messages.PingMessage;
+import ru.otus.java.hw16.server.messagesystem.Address;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,6 +22,7 @@ public class SocketMessageWorker implements MessageWorker {
 
     private final ExecutorService executorService;
     private final Socket socket;
+    private Address address;
 
     private final BlockingQueue<Message> output = new LinkedBlockingQueue<>();
     private final BlockingQueue<Message> input = new LinkedBlockingQueue<>();
@@ -31,7 +32,8 @@ public class SocketMessageWorker implements MessageWorker {
         executorService = Executors.newFixedThreadPool(WORKER_COUNT);
     }
 
-    public void init() {
+    public void init(Address.Type type, Integer localport) {
+        this.address = new Address(type, localport);
         executorService.execute(this::sendMessage);
         executorService.execute(this::receiveMessage);
     }
@@ -61,8 +63,10 @@ public class SocketMessageWorker implements MessageWorker {
 
     @Blocks
     private void sendMessage(){
+        System.out.println("sendMessage::.... this = " + this.getClass() + " socket: " + socket);
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)){
             while (socket.isConnected()){
+                System.out.println("sendMessage:: while..");
                 Message message = output.take();
                 String json = new Gson().toJson(message);
                 out.println(json);
@@ -98,8 +102,16 @@ public class SocketMessageWorker implements MessageWorker {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = (JsonObject) parser.parse(json);
         //String className = String.valueOf(jsonObject.get(Message.CLASS_NAME_VARIABLE));
-        Class<?> messageClass = PingMessage.class;
+
+        //Class<?> messageClass =  PingMessage.class;
+
+        Class<?> messageClass =  Class.forName(jsonObject.get("type").getAsString());
 
         return (Message) new Gson().fromJson(json, messageClass);
     }
+
+    public Address getAddress() {
+        return address;
+    }
+
 }

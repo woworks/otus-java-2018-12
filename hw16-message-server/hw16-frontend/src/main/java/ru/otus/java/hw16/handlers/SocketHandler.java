@@ -2,7 +2,7 @@ package ru.otus.java.hw16.handlers;
 
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
-import ru.otus.java.hw16.service.FrontendService;
+import ru.otus.java.hw16.server.service.FrontendService;
 import ru.otus.java.hw16.socket.MessageSocket;
 
 public class SocketHandler extends WebSocketHandler {

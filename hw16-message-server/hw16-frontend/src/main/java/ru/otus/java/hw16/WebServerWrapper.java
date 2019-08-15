@@ -8,7 +8,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.java.hw16.freemarker.TemplateProcessor;
 import ru.otus.java.hw16.handlers.SocketHandler;
 import ru.otus.java.hw16.server.base.DBService;
-import ru.otus.java.hw16.service.FrontendService;
+import ru.otus.java.hw16.server.messagesystem.Address;
+import ru.otus.java.hw16.server.service.FrontendService;
+import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 import ru.otus.java.hw16.service.FrontendServiceImpl;
 import ru.otus.java.hw16.service.RemoteDBService;
 import ru.otus.java.hw16.servlet.UserServlet;
@@ -22,14 +24,14 @@ class WebServerWrapper {
     private final FrontendService frontendService;
     private final DBService dbService;
 
-    WebServerWrapper() {
-        this.dbService = new RemoteDBService();
+    WebServerWrapper(SocketMessageWorker client) {
+        this.dbService = new RemoteDBService(client);
 
         this.templateProcessor = new TemplateProcessor();
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(new UserServlet(dbService, templateProcessor)), "/users");
 
-        this.frontendService = new FrontendServiceImpl(context, frontAddress);
+        this.frontendService = new FrontendServiceImpl(new Address(Address.Type.FRONTEND, FrontClientMain.LOCALPORT));
         this.frontendService.init();
 
 

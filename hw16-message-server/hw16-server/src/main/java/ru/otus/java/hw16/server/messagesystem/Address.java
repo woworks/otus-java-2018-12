@@ -1,17 +1,13 @@
 package ru.otus.java.hw16.server.messagesystem;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public final class Address {
-    private static final AtomicInteger ID_GENERATOR = new AtomicInteger();
-    private final String id;
+    private final Integer port;
+    public enum Type {SERVER, FRONTEND, DATABASE }
+    private final Type type;
 
-    public Address(){
-        id = String.valueOf(ID_GENERATOR.getAndIncrement());
-    }
-
-    public Address(String id) {
-        this.id = id;
+    public Address(Type type, Integer port){
+        this.type = type;
+        this.port = port;
     }
 
     @Override
@@ -21,15 +17,27 @@ public final class Address {
 
         Address address = (Address) o;
 
-        return id != null ? id.equals(address.id) : address.id == null;
+        return port != null ? port.equals(address.port) : address.port == null;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return port != null ? port.hashCode() : 0;
     }
 
-    public String getId() {
-        return id;
+    public Integer getPort() {
+        return port;
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "port='" + port + '\'' +
+                ", type=" + type +
+                '}';
+    }
+
+    public Type getType() {
+        return type;
     }
 }

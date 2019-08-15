@@ -1,4 +1,4 @@
-package ru.otus.java.hw16.service;
+package ru.otus.java.hw16.server.service;
 
 
 import org.eclipse.jetty.websocket.api.Session;
