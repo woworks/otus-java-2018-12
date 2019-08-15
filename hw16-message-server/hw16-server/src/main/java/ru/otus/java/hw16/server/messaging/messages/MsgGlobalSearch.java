@@ -36,7 +36,7 @@ public class MsgGlobalSearch extends MsgToSearch {
 
         String replyMessage = builder.toString();
 
-        worker.send(new MsgGlobalSearchAnswer(getTo(), getFrom(), replyMessage, sessionId));
+        worker.send(new MsgGlobalSearchReply(getTo(), getFrom(), replyMessage, sessionId));
     }
 
     @Override

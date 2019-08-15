@@ -4,6 +4,9 @@ import ru.otus.java.hw16.server.base.DBService;
 import ru.otus.java.hw16.server.datasets.UserDataSet;
 import ru.otus.java.hw16.server.messages.Message;
 import ru.otus.java.hw16.server.messages.PingMessage;
+import ru.otus.java.hw16.server.messagesystem.Address;
+import ru.otus.java.hw16.server.messaging.messages.MsgGetAllUsers;
+import ru.otus.java.hw16.server.messaging.messages.MsgGetAllUsersReply;
 import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
 import java.util.*;
@@ -32,7 +35,7 @@ public class RemoteDBService implements DBService {
     @Override
     public List<UserDataSet> readAll() {
         List<UserDataSet> users = new ArrayList<>();
-        users = (List<UserDataSet>)sendMessage(new PingMessage(client.getAddress()));
+        users = (List<UserDataSet>)sendMessage(new MsgGetAllUsers(client.getAddress(), new Address(Address.Type.DATABASE, 0)));
         return users;
     }
 
@@ -51,19 +54,20 @@ public class RemoteDBService implements DBService {
 
         //ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         //executorService.submit(() -> {
+        System.out.println("Waiting for reply for message id " + message.getId());
             while (true){
                 System.out.println("Waiting for reply");
-                Message msg = null;
+                MsgGetAllUsersReply replyMessage = null;
                 try {
-                    msg = (Message)client.take();
+                    replyMessage = (MsgGetAllUsersReply)client.take();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //MsgGlobalSearchAnswer msg = (MsgGlobalSearchAnswer)client.take();
-                System.out.println("FrontClientMain:: Front Message received: " + msg.toString());
-                if (msg.getId().equals(message.getId())) {
-                    System.out.println("RETURN MDG = " + msg);
-                    return msg;
+                //MsgGlobalSearchReply replyMessage = (MsgGlobalSearchReply)client.take();
+                System.out.println("FrontClientMain:: Message RePLY received: " + replyMessage.toString());
+                if (replyMessage.getRequestId().equals(message.getId())) {
+                    System.out.println("RETURN MDG = " + replyMessage);
+                    return replyMessage.getUsers();
                 }
             }
         //});

@@ -1,16 +1,10 @@
 package ru.otus.java.hw16;
 
 import ru.otus.java.hw16.server.client.ClientSocketMessageWorker;
-import ru.otus.java.hw16.server.messages.Message;
-import ru.otus.java.hw16.server.messages.PingMessage;
 import ru.otus.java.hw16.server.messagesystem.Address;
-import ru.otus.java.hw16.server.messaging.messages.MsgGlobalSearch;
-import ru.otus.java.hw16.server.messaging.messages.MsgGlobalSearchAnswer;
 import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Hello world!
@@ -46,7 +40,7 @@ public class FrontClientMain
         executorService.submit(() -> {
             while (true){
                 //Object msg = client.take();
-                MsgGlobalSearchAnswer msg = (MsgGlobalSearchAnswer)client.take();
+                MsgGlobalSearchReply msg = (MsgGlobalSearchReply)client.take();
                 System.out.println("FrontClientMain:: Front Message received: " + msg.toString());
                 msg.exec(null, null);
             }
