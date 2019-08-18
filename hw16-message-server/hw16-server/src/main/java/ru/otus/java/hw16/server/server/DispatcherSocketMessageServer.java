@@ -1,11 +1,13 @@
 package ru.otus.java.hw16.server.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.hw16.server.annotation.Blocks;
 import ru.otus.java.hw16.server.messages.Message;
 import ru.otus.java.hw16.server.messagesystem.Address;
-import ru.otus.java.hw16.server.workers.MessageWorker;
 import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DispatcherSocketMessageServer implements DispatcherSocketMessageServerMBean {
+    private static final Logger LOG = LogManager.getLogger(DispatcherSocketMessageServer.class);
     private static final int THREADS_COUNT = 1;
     private static final int PORT = 5050;
     private static final int MIRROR_DELAY_MS = 100;
@@ -24,29 +27,27 @@ public class DispatcherSocketMessageServer implements DispatcherSocketMessageSer
     private final Map<Integer, Address.Type> clients;
 
     public DispatcherSocketMessageServer(Map<Integer, Address.Type> clients){
-        System.out.println("DispatcherSocketMessageServer:: Start server");
+        LOG.info("DispatcherSocketMessageServer:: Start server..");
         excecutorService = Executors.newFixedThreadPool(THREADS_COUNT);
         workers = new CopyOnWriteArrayList<>();
         this.clients = clients;
     }
 
     @Blocks
-    public void start() throws Exception{
+    public void start() throws IOException {
         excecutorService.submit(this::forward);
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)){
-            System.out.println("ServerSocket is created, port: " + PORT);
+            LOG.info("ServerSocket is created, port: {}", PORT);
 
             while(!excecutorService.isShutdown()){
-                System.out.println("ServerSocket will wait for connections on port: " + PORT);
                 Socket socket = serverSocket.accept();  //blocks
-                System.out.println("ServerSocket accepted connection on port: " + PORT + " from outer socket" + socket);
-
-                System.out.println(" = = == == == == = == = FOUND " + clients.get(socket.getPort()));
+                LOG.info( "{} accepted connection from outer socket: {}", serverSocket, socket);
+                LOG.info("= New Client Connected: {}", clients.get(socket.getPort()));
                 SocketMessageWorker worker = new SocketMessageWorker(socket);
                 worker.init(clients.get(socket.getPort()), socket.getPort());
                 workers.add(worker);
-                System.out.println("DispatcherSocketMessageServer:: worker = " + worker.getAddress());
+                LOG.info("DispatcherSocketMessageServer:: worker = {}", worker.getAddress());
             }
         }
     }
@@ -56,9 +57,8 @@ public class DispatcherSocketMessageServer implements DispatcherSocketMessageSer
             for (SocketMessageWorker worker : workers){
                 Message message = worker.poll();
                 if (message != null){
-                    System.out.println("[Server] I'm worker with address: " + worker.getAddress());
-                    System.out.println("[Server] Worked took a message from: " + message.getTo() + "; to:" + message.getTo());
-
+                    LOG.info("[Server] I'm worker with address: {}", worker.getAddress());
+                    LOG.info("[Server] Worked took a message from: {}; to: {}", message.getTo(), message.getTo());
                     SocketMessageWorker destinationWorker = getDestinationWorker(message.getTo());
                     destinationWorker.send(message);
 
@@ -68,26 +68,31 @@ public class DispatcherSocketMessageServer implements DispatcherSocketMessageSer
             try {
                 Thread.sleep(MIRROR_DELAY_MS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("Sleep failed", e);
+                Thread.currentThread().interrupt();
             }
         }
 
     }
 
     private SocketMessageWorker getDestinationWorker(Address to) {
-        System.out.println("getDestinationWorker:: to = " + to);
+        LOG.info("getDestinationWorker:: to = {}", to);
+        LOG.info("getDestinationWorker:: workers = {}", workers);
         for (SocketMessageWorker worker : workers) {
-            System.out.println("getDestinationWorker:: worker address = " + worker.getAddress());
-
+            if (worker.getSocket().isClosed()) {
+                LOG.warn("Worker is closed: {}", worker.getSocket());
+                workers.remove(worker);
+                continue;
+            }
             // we take any DB worker
-            if (to.getType().equals(Address.Type.DATABASE)) {
-                System.out.println("getDestinationWorker:: found destination DB worker = " + worker);
-                return worker;
+            if (to.getType().equals(Address.Type.DATABASE) && worker.getAddress().getType().equals(Address.Type.DATABASE)) {
+                    LOG.info("getDestinationWorker:: found destination DB worker = {}", worker.getSocket());
+                    return worker;
             }
 
             // for Frontend - we take exact address
             if (worker.getAddress().equals(to)) {
-                System.out.println("getDestinationWorker:: found destination Front worker = " + worker);
+                LOG.info("getDestinationWorker:: found destination Front worker = {}", worker.getSocket());
                 return worker;
             }
         }

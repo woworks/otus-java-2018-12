@@ -13,13 +13,16 @@ import java.util.UUID;
 
 public class FrontendServiceImpl implements FrontendService {
     private final Address address;
+    private final InOutMessagesService inOutMessagesService;
     private Map<String, Session> sessions = new HashMap<>();
 
-    public FrontendServiceImpl(Address address) {
+    public FrontendServiceImpl(Address address, InOutMessagesService inOutMessagesService) {
         this.address = address;
+        this.inOutMessagesService = inOutMessagesService;
     }
 
     public void init() {
+        // no init needed
     }
 
     @Override
@@ -27,12 +30,8 @@ public class FrontendServiceImpl implements FrontendService {
         String sessionId = String.valueOf(session.hashCode());
         this.sessions.put(sessionId, session);
 
-/*        context.getMessageSystem()
-                .sendMessage(new MsgGlobalSearch(
-                        context.getFrontAddress(),
-                        context.getSearchAddress(),
-                        searchMessage, sessionId)
-                );*/
+        String searchResult = this.inOutMessagesService.sendSearchMessage(searchMessage, sessionId);
+        pushToWeb(searchResult, sessionId);
     }
 
     @Override
@@ -46,8 +45,7 @@ public class FrontendServiceImpl implements FrontendService {
 
     @Override
     public void addToResults(UUID requestId, List<UserDataSet> users) {
-        System.out.println("Users are back to FRONT requestId :" + requestId);
-        System.out.println("Users are back to FRONT users:" + users);
+        // not used
     }
 
     @Override

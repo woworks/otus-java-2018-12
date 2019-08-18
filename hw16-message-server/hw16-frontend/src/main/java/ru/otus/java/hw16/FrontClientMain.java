@@ -1,62 +1,37 @@
 package ru.otus.java.hw16;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.hw16.server.client.ClientSocketMessageWorker;
 import ru.otus.java.hw16.server.messagesystem.Address;
 import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 
 import java.io.IOException;
 
-/**
- * Hello world!
- *
- */
-public class FrontClientMain
-{
-    public static final int LOCALPORT = 20009;
+public class FrontClientMain {
+    private static final Logger LOG = LogManager.getLogger(FrontClientMain.class);
+    private static final int LOCALPORT_DEFAULT = 5051;
+    public static int localport = LOCALPORT_DEFAULT;
     private static final String HOST = "localhost";
     private static final int PORT = 5050;
-    private static final int PAUSE_MS = 5000;
-    private static final int MAX_MESSAGE_COUNT = 3;
 
-    public static void main( String[] args ) throws InterruptedException, IOException {
+    public static void main(String[] args) throws IOException {
+        if (args.length == 2) {
+             localport = Integer.valueOf(args[1]);
+        }
         new FrontClientMain().start();
     }
 
-    private void start() throws InterruptedException, IOException {
-        final SocketMessageWorker client = new ClientSocketMessageWorker(HOST, PORT, LOCALPORT);
-        client.init(Address.Type.FRONTEND, LOCALPORT);
+    private void start() throws IOException {
+        final SocketMessageWorker client = new ClientSocketMessageWorker(HOST, PORT, localport);
+        client.init(Address.Type.FRONTEND, localport);
 
-        System.out.println("FrontClientMain:: starting web... ");
+        LOG.info("FrontClientMain:: starting web... ");
 
         try {
             new WebServerWrapper(client).start();
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Cannot start WebServerWrapper", e);
         }
-
-        System.out.println("FrontClientMain:: Web started ");
-
-        /*ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.submit(() -> {
-            while (true){
-                //Object msg = client.take();
-                MsgGlobalSearchReply msg = (MsgGlobalSearchReply)client.take();
-                System.out.println("FrontClientMain:: Front Message received: " + msg.toString());
-                msg.exec(null, null);
-            }
-        });
-
-        int count = 0;
-        while (count < MAX_MESSAGE_COUNT){
-            //Message message = new PingMessage(client.getAddress());
-            Message message = new MsgGlobalSearch(client.getAddress(), new Address(Address.Type.DATABASE, 0), "hally", "SESSION_ID");
-            client.send(message);
-            System.out.println("FrontClientMain:: Message send: " + message.toString());
-            Thread.sleep(PAUSE_MS);
-            count++;
-        }
-
-        client.close();
-        executorService.shutdown();*/
     }
 }

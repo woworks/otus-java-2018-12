@@ -12,26 +12,29 @@ import ru.otus.java.hw16.server.messagesystem.Address;
 import ru.otus.java.hw16.server.service.FrontendService;
 import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 import ru.otus.java.hw16.service.FrontendServiceImpl;
-import ru.otus.java.hw16.service.RemoteDBService;
+import ru.otus.java.hw16.service.InOutMessagesService;
+import ru.otus.java.hw16.service.RemoteDBServiceImpl;
 import ru.otus.java.hw16.servlet.UserServlet;
 
 
 class WebServerWrapper {
 
-    private final int PORT = 8080;
+    private static final int PORT = 8080;
     private final TemplateProcessor templateProcessor;
     private final Server server = new Server(PORT);
     private final FrontendService frontendService;
     private final DBService dbService;
+    private final InOutMessagesService inOutMessagesService;
 
     WebServerWrapper(SocketMessageWorker client) {
-        this.dbService = new RemoteDBService(client);
+        this.inOutMessagesService = new InOutMessagesService(client);
+        this.dbService = new RemoteDBServiceImpl(inOutMessagesService);
 
         this.templateProcessor = new TemplateProcessor();
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(new UserServlet(dbService, templateProcessor)), "/users");
 
-        this.frontendService = new FrontendServiceImpl(new Address(Address.Type.FRONTEND, FrontClientMain.LOCALPORT));
+        this.frontendService = new FrontendServiceImpl(new Address(Address.Type.FRONTEND, FrontClientMain.localport), inOutMessagesService);
         this.frontendService.init();
 
 
@@ -39,6 +42,9 @@ class WebServerWrapper {
         // first element  is webSocket handler, second element is first handler
         handlers.setHandlers(new Handler[] {new SocketHandler(frontendService), servletContextHandler});
         server.setHandler(handlers);
+
+        this.inOutMessagesService.start();
+
     }
 
 

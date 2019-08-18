@@ -1,5 +1,7 @@
 package ru.otus.java.hw16.server.messaging.messages;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.hw16.server.datasets.UserDataSet;
 import ru.otus.java.hw16.server.messages.MsgToSearch;
 import ru.otus.java.hw16.server.messages.SearchService;
@@ -9,6 +11,9 @@ import ru.otus.java.hw16.server.workers.SocketMessageWorker;
 import java.util.List;
 
 public class MsgGlobalSearch extends MsgToSearch {
+
+    private static final Logger LOG = LogManager.getLogger(MsgGlobalSearch.class);
+
     private final String searchMessage;
     private final String sessionId;
 
@@ -20,15 +25,14 @@ public class MsgGlobalSearch extends MsgToSearch {
 
     @Override
     public void exec(SearchService searchService, SocketMessageWorker worker) {
-        System.out.println("Searching for..." + searchMessage);
-
+        LOG.info("Searching for: {}", searchMessage);
 
         List<UserDataSet> userDataSets = searchService.getDBService().findByName(searchMessage);
 
-        if (userDataSets.size() > 0) {
-            System.out.println("INFO:: Found reply for " + searchMessage + " = " + userDataSets);
+        if (!userDataSets.isEmpty()) {
+            LOG.info("Found reply for {} = {}", searchMessage, userDataSets);
         } else {
-            System.out.println("WARN:: Nothing found for " + searchMessage);
+            LOG.warn("Nothing found for {}", searchMessage);
         }
 
         StringBuilder builder = new StringBuilder();
@@ -36,7 +40,7 @@ public class MsgGlobalSearch extends MsgToSearch {
 
         String replyMessage = builder.toString();
 
-        worker.send(new MsgGlobalSearchReply(getTo(), getFrom(), replyMessage, sessionId));
+        worker.send(new MsgGlobalSearchReply(getTo(), getFrom(), replyMessage, sessionId, getId()));
     }
 
     @Override

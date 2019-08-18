@@ -5,6 +5,10 @@ public final class Address {
     public enum Type {SERVER, FRONTEND, DATABASE }
     private final Type type;
 
+    public Address(Type type) {
+        this(type, 0);
+    }
+
     public Address(Type type, Integer port){
         this.type = type;
         this.port = port;

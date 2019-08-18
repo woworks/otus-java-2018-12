@@ -1,47 +1,44 @@
 package ru.otus.java.hw16.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.hw16.server.messagesystem.Address;
 import ru.otus.java.hw16.server.runner.ProcessRunnerImpl;
 import ru.otus.java.hw16.server.server.DispatcherSocketMessageServer;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Hello world!
- *
- */
-public class ServerMain
-{
-    private static final String CLIENT_START_COMMAND = "java -jar ../_1611-client/target/client.jar -port 5051";
+public class ServerMain {
+    private static final Logger LOG = LogManager.getLogger(ServerMain.class);
+    public static final int FRONT_PORT_1 = 5051;
+    public static final int DB_PORT_1 = 5061;
+    public static final int DB_PORT_2 = 5062;
+    private static final String DB_START_COMMAND_1 = "java -jar ../../hw16-dbserver/target/hw16-dbserver-jar-with-dependencies.jar -port " + DB_PORT_1;
+    private static final String DB_START_COMMAND_2 = "java -jar ../../hw16-dbserver/target/hw16-dbserver-jar-with-dependencies.jar -port " + DB_PORT_2;
+    private static final String FRONT_START_COMMAND = "java -jar ../../hw16-frontend/target/hw16-frontend-jar-with-dependencies.jar -port " + FRONT_PORT_1;
     private static final int CLIENT_START_DELAY_SEC = 5;
     private static final Map<Integer, Address.Type> clients = new HashMap<>();
 
-    public static void main( String[] args ) throws Exception {
+
+    public static void main(String[] args) throws Exception {
         new ServerMain().start();
     }
 
-    private void start() throws Exception {
+    private void start() throws IOException {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-        //startClient( executorService );
-        //clients.put(, Address.Type.SERVER);
-        clients.put(20009, Address.Type.FRONTEND);
-        clients.put(20008, Address.Type.DATABASE);
+        startClient(executorService);
+        clients.put(FRONT_PORT_1, Address.Type.FRONTEND);
+        clients.put(DB_PORT_1, Address.Type.DATABASE);
+        clients.put(DB_PORT_2, Address.Type.DATABASE);
 
-        //MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        //ObjectName objectName = new ObjectName("ru.otus.java:type=Server");
 
         DispatcherSocketMessageServer server = new DispatcherSocketMessageServer(clients);
-        //mBeanServer.registerMBean(server, objectName);
-
         server.start();
 
         executorService.shutdown();
@@ -51,10 +48,11 @@ public class ServerMain
     private void startClient(ScheduledExecutorService executorService) {
         executorService.schedule(() -> {
             try {
-                new ProcessRunnerImpl().start(CLIENT_START_COMMAND);
-               // System.out.println("CLient started");
+                new ProcessRunnerImpl().start(DB_START_COMMAND_1);
+                new ProcessRunnerImpl().start(DB_START_COMMAND_2);
+                new ProcessRunnerImpl().start(FRONT_START_COMMAND);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("Could not start all the client services", e);
             }
 
         }, CLIENT_START_DELAY_SEC, TimeUnit.SECONDS);

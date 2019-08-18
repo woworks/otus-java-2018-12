@@ -17,7 +17,7 @@ public abstract class MsgToServer extends Message {
         if (addressee instanceof ServerService) {
             exec((ServerService) addressee, (SocketMessageWorker)worker);
         } else {
-            //todo error!
+            throw new IllegalArgumentException("Adressee is not ServerService");
         }
     }
 

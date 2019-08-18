@@ -3,6 +3,8 @@ package ru.otus.java.hw16.server.workers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.otus.java.hw16.server.annotation.Blocks;
 import ru.otus.java.hw16.server.messages.Message;
 import ru.otus.java.hw16.server.messagesystem.Address;
@@ -18,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SocketMessageWorker implements MessageWorker {
+    private static final Logger LOG = LogManager.getLogger(SocketMessageWorker.class);
     private static final int WORKER_COUNT = 2;
 
     private final ExecutorService executorService;
@@ -63,17 +66,19 @@ public class SocketMessageWorker implements MessageWorker {
 
     @Blocks
     private void sendMessage(){
-        System.out.println("sendMessage::.... this = " + this.getClass() + " socket: " + socket);
+        LOG.info("sendMessage::.... prepared to send messages on socket: {}", socket);
         try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true)){
             while (socket.isConnected()){
-                System.out.println("sendMessage:: while..");
+                LOG.info("sendMessage:: waiting for a new messages in queue..");
                 Message message = output.take();
                 String json = new Gson().toJson(message);
                 out.println(json);
                 out.println();
+                LOG.info("sendMessage:: message:{}; was sent to: {}", message, socket);
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            LOG.error("Socket error", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -82,6 +87,7 @@ public class SocketMessageWorker implements MessageWorker {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))){
             String inputLine;
             StringBuilder stringBuilder = new StringBuilder();
+            LOG.info("Socket is closed: {}", socket.isClosed());
             while ((inputLine = reader.readLine()) != null){
                 stringBuilder.append(inputLine);
                 if (inputLine.isEmpty()){
@@ -92,7 +98,7 @@ public class SocketMessageWorker implements MessageWorker {
                 }
             }
         }  catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+           LOG.error("Could not receive message!", e);
         }
 
     }
@@ -101,12 +107,7 @@ public class SocketMessageWorker implements MessageWorker {
 
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = (JsonObject) parser.parse(json);
-        //String className = String.valueOf(jsonObject.get(Message.CLASS_NAME_VARIABLE));
-
-        //Class<?> messageClass =  PingMessage.class;
-
         Class<?> messageClass =  Class.forName(jsonObject.get("type").getAsString());
-
         return (Message) new Gson().fromJson(json, messageClass);
     }
 
@@ -114,4 +115,7 @@ public class SocketMessageWorker implements MessageWorker {
         return address;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
 }

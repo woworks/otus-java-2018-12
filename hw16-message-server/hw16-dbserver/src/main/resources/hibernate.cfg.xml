@@ -10,7 +10,7 @@
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/hw16-dbserver</property>
         <property name="hibernate.connection.username">hw16dbserver</property>
         <property name="hibernate.connection.password">hw16dbserver</property>
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.connection.useSSL">false</property>
         <property name="hibernate.enable_lazy_load_no_trans">true</property>
