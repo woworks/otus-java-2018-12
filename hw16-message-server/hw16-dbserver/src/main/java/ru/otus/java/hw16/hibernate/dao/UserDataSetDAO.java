@@ -28,7 +28,7 @@ public class UserDataSetDAO {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<UserDataSet> criteria = builder.createQuery(UserDataSet.class);
         Root<UserDataSet> from = criteria.from(UserDataSet.class);
-        criteria.where(builder.like(from.get("name"), name));
+        criteria.where(builder.like(from.get("name"), "%" + name + "%"));
         Query<UserDataSet> query = session.createQuery(criteria);
         return query.getResultList();
     }

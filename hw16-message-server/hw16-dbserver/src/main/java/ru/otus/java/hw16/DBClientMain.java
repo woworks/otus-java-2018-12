@@ -44,10 +44,14 @@ public class DBClientMain {
         LOG.info("Starting DATABASE client, port: {}", localport);
 
         while (true) {
+            try {
             // wait till new element appears
             Message msg = client.take();
             LOG.info("[DB] Message received: " + msg.toString());
             msg.exec(searchService, client);
+            } catch (Exception e) {
+                LOG.error("Could not process the message", e);
+            }
         }
     }
 }

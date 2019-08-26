@@ -36,7 +36,7 @@
         ws.onopen = function () {
         };
         ws.onmessage = function (message) {
-            document.getElementById("someDiv").textContent += message.data + "\n";
+            document.getElementById("resultsDiv").textContent = message.data + "\n";
         };
 
         function postToServer() {
@@ -52,11 +52,11 @@
 <body>
 
 
-<div>Global search. Please find term to search: </div>
+<div>Name search. Please find term to search: </div>
 <input id="msg" type="text"/>
 <button type="submit" id="postToServerButton" onClick="postToServer()">Send!</button>
 <button type="submit" id="closeConnectButton" onClick="closeConnect()">End</button>
-<div id="someDiv" style="background-color: #dddddd"></div>
+<div id="resultsDiv" style="background-color: #ddddff; font-size: 14px"></div>
 
 <#if errorMessage??><div style="background-color: lightcoral; padding: 5px">${errorMessage}</div></#if>
 
@@ -92,7 +92,7 @@
     </#list>
 
 </table>
-
+<!--
 <div style="width: 400px">
     <h2>Add new user:</h2>
     <form action="/users" method="post">
@@ -118,6 +118,6 @@
     </form>
 
 </div>
-
+-->
 </body>
 </html>

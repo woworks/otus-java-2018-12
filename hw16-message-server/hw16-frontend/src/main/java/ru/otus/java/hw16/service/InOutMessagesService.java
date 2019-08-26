@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 
 public class InOutMessagesService {
     private static final Logger LOG = LogManager.getLogger(InOutMessagesService.class);
-    private final int TIMEOUT = 2_000;
+    private static final int TIMEOUT = 2_000;
     private final SocketMessageWorker client;
     private final CopyOnWriteArrayList<MsgToFrontend> receivedMessages = new CopyOnWriteArrayList<>();
 
@@ -33,9 +33,14 @@ public class InOutMessagesService {
         ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.submit(() -> {
             while (true){
+                try {
                 MsgToFrontend msg = (MsgToFrontend)client.take();
-                System.out.println("FrontClientMain:: Front Message received: " + msg.toString());
+                LOG.info("FrontClientMain:: Front Message received: {}", msg.toString());
                 receivedMessages.add(msg);
+                } catch (Exception e) {
+                    LOG.error("Could not receive message", e);
+                    continue;
+                }
             }
         });
     }
@@ -75,7 +80,7 @@ public class InOutMessagesService {
 
             for (MsgToFrontend msg : receivedMessages) {
                 if (msg.getRequestId().equals(message.getId())) {
-                    System.out.println("[" + time + "]RETURN MSG = " + msg);
+                    LOG.info("[" + time + "]RETURN MSG = " + msg);
                     receivedMessages.remove(msg);
                     return msg;
                 }
