@@ -41,13 +41,17 @@ public class DispatcherSocketMessageServer implements DispatcherSocketMessageSer
             LOG.info("ServerSocket is created, port: {}", PORT);
 
             while (!excecutorService.isShutdown()) {
-                Socket socket = serverSocket.accept();  //blocks
-                LOG.info("{} accepted connection from outer socket: {}", serverSocket, socket);
-                LOG.info("= New Client Connected: {}", clients.get(socket.getPort()));
-                SocketMessageWorker worker = new SocketMessageWorker(socket);
-                worker.init(clients.get(socket.getPort()), socket.getPort());
-                workers.add(worker);
-                LOG.info("DispatcherSocketMessageServer:: worker = {}", worker.getAddress());
+                try {
+                    Socket socket = serverSocket.accept();  //blocks
+                    LOG.info("{} accepted connection from outer socket: {}", serverSocket, socket);
+                    LOG.info("= New Client Connected: {}", clients.get(socket.getPort()));
+                    SocketMessageWorker worker = new SocketMessageWorker(socket);
+                    worker.init(clients.get(socket.getPort()), socket.getPort());
+                    workers.add(worker);
+                    LOG.info("DispatcherSocketMessageServer:: worker = {}", worker.getAddress());
+                } catch (Exception e) {
+                    LOG.error("DispatcherSocketMessageServer failed to receive a message", e);
+                }
             }
         }
     }
@@ -62,9 +66,12 @@ public class DispatcherSocketMessageServer implements DispatcherSocketMessageSer
                         LOG.info("[Server] I'm worker with address: {}", worker.getAddress());
                         LOG.info("[Server] Worked took a message from: {}; to: {}", message.getTo(), message.getTo());
                         SocketMessageWorker destinationWorker = getDestinationWorker(message.getTo());
-                        destinationWorker.send(message);
+                        if (destinationWorker != null) {
+                            destinationWorker.send(message);
+                        } else {
+                            throw new RuntimeException("Could not find destination worker");
+                        }
 
-                        message = worker.poll();
                     }
                 }
 
