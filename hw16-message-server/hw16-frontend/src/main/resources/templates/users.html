@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head title="Users">
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+
+        input {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+            width: 300px;
+        }
+
+        button {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+    </style>
+    <script>
+        var ws = new WebSocket("ws://localhost:8080");
+        ws.onopen = function () {
+        };
+        ws.onmessage = function (message) {
+            document.getElementById("resultsDiv").textContent = message.data + "\n";
+        };
+
+        function postToServer() {
+            ws.send(document.getElementById("msg").value);
+            document.getElementById("msg").value = "";
+        }
+
+        function closeConnect() {
+            ws.close();
+        }
+    </script>
+</head>
+<body>
+
+
+<div>Name search. Please find term to search: </div>
+<input id="msg" type="text"/>
+<button type="submit" id="postToServerButton" onClick="postToServer()">Send!</button>
+<button type="submit" id="closeConnectButton" onClick="closeConnect()">End</button>
+<div id="resultsDiv" style="background-color: #ddddff; font-size: 14px"></div>
+
+<#if errorMessage??><div style="background-color: lightcoral; padding: 5px">${errorMessage}</div></#if>
+
+<h2>Users(${users?size}):</h2>
+<!--
+<div style="width: 600px">
+    <h2>Find user by id:</h2>
+    <form action="/users" method="get">
+        <div style="width: 100%; text-align: left; padding-bottom: 10px">
+            Id: <input type="text" name="id" value="${id}">
+            <button type="submit" value="Submit">Search</button>
+            </div>
+    </form>
+
+</div>
+-->
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Phone</th>
+        <th>Address</th>
+    </tr>
+    <#list users as user>
+    <tr>
+        <td>${user.getId()}</td>
+        <td>${user.name}</td>
+        <td>${user.age} Years Old</td>
+        <td><#list user.phones as phone>${phone.number}, </#list></td>
+        <td><#if user.address??>${user.address.street}</#if></td>
+    </tr>
+    </#list>
+
+</table>
+<!--
+<div style="width: 400px">
+    <h2>Add new user:</h2>
+    <form action="/users" method="post">
+        <fieldset>
+            <legend>Personal information:</legend>
+            Name*:<br>
+            <input required="required" type="text" name="name"><br>
+
+            Age*:<br>
+            <input required="required" type="text" name="age"><br><br>
+
+            Phones:<br>
+            <input type="text" name="phone1"><br><br>
+            <input type="text" name="phone2"><br><br>
+
+            Address:<br>
+            <input type="text" name="address"><br><br>
+
+            <div style="width: 100%; text-align: right">
+                <input type="submit" style="width: 100px; text-align: center" value="Submit">
+            </div>
+        </fieldset>
+    </form>
+
+</div>
+-->
+</body>
+</html>
