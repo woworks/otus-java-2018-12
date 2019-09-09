@@ -5,12 +5,17 @@ import ru.otus.java.hw08.annotation.annotations.Log;
 public class MyClassImpl {
 
     @Log
-    public void secureLoggedAccess(String param) {
-        System.out.println("secureLoggedAccess, param:" + param);
+    public void secureLoggedAccess(String secureLoggedAccessParam) {
+        System.out.println("secureLoggedAccess, param: " + secureLoggedAccessParam);
     }
 
-    public void secureAccess(String param) {
-        System.out.println("secureAccess, param:" + param);
+    @Log
+    public void secureLoggedAccessInt(Integer secureLoggedAccessIntParam) {
+        System.out.println("secureLoggedAccess, param:" + secureLoggedAccessIntParam);
+    }
+
+    public void secureAccess(String secureAccessParam) {
+        System.out.println("secureAccess, secureAccessParam:" + secureAccessParam);
     }
 
     @Override
