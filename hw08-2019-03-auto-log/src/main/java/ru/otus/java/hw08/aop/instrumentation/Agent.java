@@ -10,8 +10,7 @@ import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.objectweb.asm.Opcodes.H_INVOKESTATIC;
 
@@ -26,7 +25,7 @@ public class Agent {
                                     Class<?> classBeingRedefined,
                                     ProtectionDomain protectionDomain,
                                     byte[] classfileBuffer) {
-                List<String> methodsToBeLogged =
+                Set<String> methodsToBeLogged =
                         findAnnotatedMethods(classfileBuffer);
 
                 if (!methodsToBeLogged.isEmpty()) {
@@ -38,7 +37,7 @@ public class Agent {
 
     }
 
-    private static byte[] addProxyMethods(byte[] originalClass, String className, List<String> methodsToBeLogged) {
+    private static byte[] addProxyMethods(byte[] originalClass, String className, Set<String> methodsToBeLogged) {
         System.out.println("addProxyMethods:: methodsToBeLogged = " + methodsToBeLogged);
         System.out.println("addProxyMethods:: className = " + className);
         ClassReader cr = new ClassReader(originalClass);
@@ -109,8 +108,8 @@ public class Agent {
         return finalClass;
     }
 
-    static List<String> findAnnotatedMethods(byte[] originalClass) {
-        List<String> methods = new ArrayList<>();
+    static Set<String> findAnnotatedMethods(byte[] originalClass) {
+        Set<String> methods = new HashSet<>();
         ClassReader cr = new ClassReader(originalClass);
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
         ClassVisitor cv = new ClassVisitor(Opcodes.ASM5, cw) {
