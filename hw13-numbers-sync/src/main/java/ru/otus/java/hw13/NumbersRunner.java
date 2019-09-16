@@ -1,15 +1,15 @@
 package ru.otus.java.hw13;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NumbersRunner {
 
     private static final Logger LOG = LogManager.getLogger(NumbersRunner.class.getName());
     private static final Object lock = new Object();
+    private static Long firstThreadId = -1L;
     private boolean firstAlreadyRead = false;
     private boolean forward = true;
 
@@ -17,19 +17,23 @@ public class NumbersRunner {
 
     private void printNumbers() {
         while ((forward && counter.get() < 10) || (!forward && counter.get() > 1)) {
-
             synchronized (lock) {
-                if (!firstAlreadyRead) {
-                    System.out.print("Thread [" + Thread.currentThread().getName() + "] " + counter.get() + " |  ");
+                if (!firstAlreadyRead && Thread.currentThread().getId() != firstThreadId && firstThreadId != -1) {
+                    //System.out.println("Second Thread wants to be First");
+                } else if (!firstAlreadyRead) {
+                    if (firstThreadId == -1) {
+                        firstThreadId = Thread.currentThread().getId();
+                    }
+                    System.out.print("FThread [" + Thread.currentThread().getName() + "] " + counter.get() + " |  ");
                     try {
                         firstAlreadyRead = true;
-                        lock.notify();
+                        lock.notifyAll();
                         lock.wait();
                     } catch (InterruptedException e) {
                         LOG.error("ThreadId = " + Thread.currentThread().getId(), e);
                     }
                 } else {
-                    System.out.println("Thread [" + Thread.currentThread().getName() + "] " + counter.get());
+                    System.out.println("SThread [" + Thread.currentThread().getName() + "] " + counter.get());
                     firstAlreadyRead = false;
                     if (forward) {
                         counter.getAndIncrement();
@@ -38,11 +42,11 @@ public class NumbersRunner {
                     }
 
                     try {
-                        lock.notify();
+                        lock.notifyAll();
                         lock.wait();
 
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        LOG.error("Wait failed", e);
                     }
                 }
                 lock.notifyAll();
@@ -51,7 +55,7 @@ public class NumbersRunner {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("Sleep failed", e);
             }
 
             if (counter.get() == 10) {
